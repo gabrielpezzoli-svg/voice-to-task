@@ -134,6 +134,18 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);tran
 .cal-mini-d.today .dm-n,.cal-mini-d.today .dm-d{color:#08080f;font-weight:700}
 .cal-mini-d.has-ev::after{content:'';display:block;width:4px;height:4px;background:var(--accent3);border-radius:50%;margin:.15rem auto 0}
 .quote-widget{grid-column:1/-1;background:linear-gradient(135deg,rgba(155,138,251,.1),rgba(82,232,162,.07));border-color:rgba(155,138,251,.2)}
+.weather-widget{grid-column:1/-1;background:linear-gradient(135deg,#0d1b2e,#0a2240);border-color:rgba(96,165,250,.2);cursor:pointer}
+.weather-widget:hover{border-color:rgba(96,165,250,.4)}
+.wx-main{display:flex;align-items:center;justify-content:space-between;margin-bottom:.75rem}
+.wx-temp{font-family:'Syne',sans-serif;font-size:3rem;font-weight:800;line-height:1;letter-spacing:-.04em;color:#fff}
+.wx-icon{font-size:3rem;line-height:1}
+.wx-desc{font-size:.8rem;color:rgba(255,255,255,.7);text-transform:capitalize;margin-top:.15rem}
+.wx-city{font-size:.65rem;color:rgba(96,165,250,.8);margin-bottom:.75rem;display:flex;align-items:center;gap:.3rem}
+.wx-details{display:flex;gap:1rem;flex-wrap:wrap}
+.wx-detail{font-size:.65rem;color:rgba(255,255,255,.5);display:flex;align-items:center;gap:.3rem}
+.wx-detail span:last-child{color:rgba(255,255,255,.85);font-weight:500}
+.wx-loading{font-size:.72rem;color:rgba(96,165,250,.6);text-align:center;padding:.5rem}
+.wx-error{font-size:.7rem;color:var(--accent4);text-align:center;padding:.5rem}
 .quote-text{font-size:.82rem;font-style:italic;line-height:1.7;color:var(--text)}
 .quote-author{font-size:.65rem;color:var(--muted);margin-top:.4rem}
 .upcoming-list{display:flex;flex-direction:column;gap:.5rem}
@@ -403,6 +415,10 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);tran
           <div class="widget-label"><span class="wdot" style="background:var(--accent5)"></span>Prochains événements</div>
           <div id="h-upcoming-list"><div style="font-size:.72rem;color:var(--muted)">Aucun événement à venir</div></div>
         </div>
+        <div class="widget full weather-widget" onclick="refreshWeather()">
+          <div class="widget-label"><span class="wdot" style="background:var(--accent5)"></span>Météo <span id="wx-refresh" style="margin-left:auto;font-size:.6rem;color:rgba(96,165,250,.5)">Appuie pour actualiser</span></div>
+          <div id="wx-content"><div class="wx-loading">📍 Localisation en cours...</div></div>
+        </div>
         <div class="widget full quote-widget">
           <div class="quote-text" id="h-quote"></div>
           <div class="quote-author" id="h-quote-author"></div>
@@ -637,6 +653,7 @@ onAuthStateChanged(auth, async user => {
     document.getElementById('evt-date').value = new Date().toISOString().split('T')[0];
     renderAll();
     showSyncBadge();
+    initWeather();
 
     // Show Gemini prompt if no key saved
     if (!apiKey) {
@@ -1058,6 +1075,109 @@ function renderStickies(){
   if(!stickies.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📝</div><div class="empty-text">Aucune note.</div></div>';return;}
   el.innerHTML=stickies.map(s=>`<div class="sticky" style="background:${s.color}22;border-color:${s.color}44"><div class="sticky-hdr"><span class="sticky-tag" style="background:${s.color}22;color:${s.color}">Note</span><button class="sticky-del" onclick="deleteSticky('${s.id}')">✕</button></div><textarea class="sticky-content" oninput="updateSticky('${s.id}',this.value)">${s.text||''}</textarea><div class="sticky-date">${new Date(s.created).toLocaleDateString('fr-FR',{day:'numeric',month:'short'})}</div></div>`).join('');
 }
+
+/* ── MÉTÉO ── */
+const WX_ICONS = {
+  0:'☀️',1:'🌤️',2:'⛅',3:'☁️',
+  45:'🌫️',48:'🌫️',
+  51:'🌦️',53:'🌦️',55:'🌧️',
+  61:'🌧️',63:'🌧️',65:'🌧️',
+  71:'🌨️',73:'🌨️',75:'❄️',
+  80:'🌦️',81:'🌦️',82:'🌧️',
+  95:'⛈️',96:'⛈️',99:'⛈️'
+};
+const WX_DESC = {
+  0:'Ciel dégagé',1:'Principalement dégagé',2:'Partiellement nuageux',3:'Couvert',
+  45:'Brouillard',48:'Brouillard givrant',
+  51:'Bruine légère',53:'Bruine modérée',55:'Bruine dense',
+  61:'Pluie légère',63:'Pluie modérée',65:'Pluie forte',
+  71:'Neige légère',73:'Neige modérée',75:'Neige forte',
+  80:'Averses légères',81:'Averses modérées',82:'Averses fortes',
+  95:'Orage',96:'Orage avec grêle',99:'Orage violent'
+};
+
+let wxData = null;
+let wxCity = '';
+
+async function initWeather() {
+  const el = document.getElementById('wx-content');
+  if(!el) return;
+  if(!navigator.geolocation) {
+    el.innerHTML='<div class="wx-error">Géolocalisation non disponible</div>';
+    return;
+  }
+  el.innerHTML='<div class="wx-loading">📍 Localisation en cours...</div>';
+  navigator.geolocation.getCurrentPosition(
+    async pos => {
+      const {latitude:lat, longitude:lon} = pos.coords;
+      await fetchWeather(lat, lon);
+    },
+    err => {
+      // fallback: Paris
+      fetchWeather(48.8566, 2.3522, 'Paris');
+    },
+    {timeout:8000}
+  );
+}
+
+async function fetchWeather(lat, lon, fallbackCity='') {
+  const el = document.getElementById('wx-content');
+  if(!el) return;
+  try {
+    // Get weather from Open-Meteo (100% gratuit, pas de clé)
+    const wxRes = await fetch(
+      `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m&wind_speed_unit=kmh&temperature_unit=celsius`
+    );
+    const wxJson = await wxRes.json();
+    const cur = wxJson.current;
+
+    // Get city name from reverse geocoding (nominatim)
+    let city = fallbackCity;
+    if(!city) {
+      try {
+        const geoRes = await fetch(`https://nominatim.openstreetmap.org/reverse?lat=${lat}&lon=${lon}&format=json`);
+        const geoJson = await geoRes.json();
+        city = geoJson.address?.city || geoJson.address?.town || geoJson.address?.village || geoJson.address?.county || '';
+      } catch(e) { city = ''; }
+    }
+
+    wxCity = city;
+    wxData = cur;
+    renderWeather(cur, city);
+  } catch(e) {
+    if(el) el.innerHTML=`<div class="wx-error">Impossible de charger la météo</div>`;
+  }
+}
+
+function renderWeather(cur, city) {
+  const el = document.getElementById('wx-content');
+  if(!el) return;
+  const code = cur.weather_code;
+  const icon = WX_ICONS[code] || '🌡️';
+  const desc = WX_DESC[code] || 'Conditions inconnues';
+  const temp = Math.round(cur.temperature_2m);
+  const feels = Math.round(cur.apparent_temperature);
+  const humidity = cur.relative_humidity_2m;
+  const wind = Math.round(cur.wind_speed_10m);
+
+  el.innerHTML = `
+    <div class="wx-city">📍 ${city || 'Position actuelle'}</div>
+    <div class="wx-main">
+      <div>
+        <div class="wx-temp">${temp}°</div>
+        <div class="wx-desc">${desc}</div>
+      </div>
+      <div class="wx-icon">${icon}</div>
+    </div>
+    <div class="wx-details">
+      <div class="wx-detail"><span>🌡️</span><span>Ressenti</span><span>${feels}°</span></div>
+      <div class="wx-detail"><span>💧</span><span>Humidité</span><span>${humidity}%</span></div>
+      <div class="wx-detail"><span>💨</span><span>Vent</span><span>${wind} km/h</span></div>
+    </div>`;
+  document.getElementById('wx-refresh').textContent = 'Actualisé à ' + new Date().toLocaleTimeString('fr-FR',{hour:'2-digit',minute:'2-digit'});
+}
+
+window.refreshWeather = () => initWeather();
 
 /* ── TOAST ── */
 function showToast(msg,type=''){
