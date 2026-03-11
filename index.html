@@ -103,7 +103,7 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);tran
 @keyframes fadeUp{from{opacity:0;transform:translateY(10px)}to{opacity:1;transform:translateY(0)}}
 
 /* BOTTOM NAV */
-.bottom-nav{height:var(--nav-h);flex-shrink:0;display:grid;grid-template-columns:repeat(4,1fr);gap:6px;padding:8px 12px 18px;background:var(--surface);border-top:1px solid var(--border);position:relative;z-index:100}
+.bottom-nav{height:var(--nav-h);flex-shrink:0;display:grid;grid-template-columns:repeat(5,1fr);gap:6px;padding:8px 12px 18px;background:var(--surface);border-top:1px solid var(--border);position:relative;z-index:100}
 .nav-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;border-radius:16px;cursor:pointer;background:transparent;border:1px solid transparent;transition:all .2s;padding:6px 4px}
 .nav-btn.active{background:var(--card2);border-color:var(--border2)}
 .nav-icon{font-size:1.5rem;line-height:1}
@@ -307,6 +307,44 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);tran
 .toast.success{border-color:var(--accent3);color:var(--accent3)}
 .toast.error{border-color:var(--accent4);color:var(--accent4)}
 .empty-state{text-align:center;padding:2.5rem 1rem;color:var(--muted)}
+
+/* SPOTIFY */
+.spotify-widget{grid-column:1/-1;background:linear-gradient(135deg,#0d1f0d,#0a2d10);border-color:rgba(30,215,96,.2)}
+.spotify-widget:hover{border-color:rgba(30,215,96,.4)}
+.sp-connected{display:flex;flex-direction:column;gap:.6rem}
+.sp-track{display:flex;align-items:center;gap:.9rem}
+.sp-cover{width:52px;height:52px;border-radius:10px;object-fit:cover;background:var(--card2);flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:1.5rem}
+.sp-cover img{width:100%;height:100%;border-radius:10px;object-fit:cover}
+.sp-info{flex:1;min-width:0}
+.sp-title{font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-artist{font-size:.68rem;color:rgba(30,215,96,.7);margin-top:.15rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.sp-controls{display:flex;align-items:center;gap:.5rem}
+.sp-btn{background:none;border:none;color:rgba(30,215,96,.8);font-size:1.4rem;cursor:pointer;padding:.2rem;transition:all .15s;line-height:1}
+.sp-btn:hover{color:#1ed760;transform:scale(1.15)}
+.sp-btn.play{width:38px;height:38px;border-radius:50%;background:rgba(30,215,96,.15);border:1px solid rgba(30,215,96,.3);display:flex;align-items:center;justify-content:center;font-size:1.1rem}
+.sp-progress{height:3px;background:var(--border2);border-radius:2px;margin-top:.4rem}
+.sp-progress-bar{height:100%;background:#1ed760;border-radius:2px;transition:width .5s linear}
+.sp-disconnected{text-align:center;padding:.5rem}
+.btn-spotify{background:#1ed760;color:#000;border:none;border-radius:12px;padding:.75rem 1.5rem;font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;cursor:pointer;transition:all .2s;display:inline-flex;align-items:center;gap:.5rem}
+.btn-spotify:hover{opacity:.88;transform:translateY(-1px)}
+.sp-not-playing{font-size:.75rem;color:rgba(30,215,96,.5);text-align:center;padding:.5rem}
+
+/* BUCKET LIST */
+.bucket-item{display:flex;align-items:flex-start;gap:12px;padding:14px 16px;background:var(--card);border:1px solid var(--border);border-radius:14px;animation:slideIn .25s ease;margin-bottom:8px}
+.bucket-item.done{opacity:.5}
+.bucket-check{width:24px;height:24px;border-radius:50%;border:2px solid var(--accent);display:flex;align-items:center;justify-content:center;cursor:pointer;flex-shrink:0;margin-top:1px;transition:all .15s;font-size:.75rem;color:transparent}
+.bucket-item.done .bucket-check{background:var(--accent);color:#08080f}
+.bucket-info{flex:1}
+.bucket-text{font-size:.85rem;font-weight:500;line-height:1.4}
+.bucket-item.done .bucket-text{text-decoration:line-through}
+.bucket-cat{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.25rem;font-weight:600}
+.bucket-del{background:none;border:none;color:var(--muted);font-size:.85rem;padding:2px 6px;border-radius:5px;cursor:pointer;transition:all .15s}
+.bucket-del:hover{color:var(--accent4);background:rgba(248,113,113,.1)}
+.bucket-stats{display:flex;gap:12px;margin-bottom:14px;flex-wrap:wrap}
+.bstat{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:10px 14px;flex:1;min-width:80px;text-align:center}
+.bstat-num{font-family:'Syne',sans-serif;font-size:1.6rem;font-weight:800;line-height:1}
+.bstat-lbl{font-size:.6rem;color:var(--muted);text-transform:uppercase;letter-spacing:.08em;margin-top:.15rem}
+.bucket-cats{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px}
 .empty-icon{font-size:2.5rem;margin-bottom:.75rem;opacity:.4}
 .empty-text{font-size:.75rem;line-height:1.6}
 </style>
@@ -419,6 +457,10 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);tran
           <div class="widget-label"><span class="wdot" style="background:var(--accent5)"></span>Météo <span id="wx-refresh" style="margin-left:auto;font-size:.6rem;color:rgba(96,165,250,.5)">Appuie pour actualiser</span></div>
           <div id="wx-content"><div class="wx-loading">📍 Localisation en cours...</div></div>
         </div>
+        <div class="widget full spotify-widget clickable">
+          <div class="widget-label"><span class="wdot" style="background:#1ed760"></span>Spotify <span id="sp-refresh-lbl" style="margin-left:auto;font-size:.6rem;color:rgba(30,215,96,.4)"></span></div>
+          <div id="sp-content"><div class="sp-disconnected"><div style="font-size:2rem;margin-bottom:.5rem">🎵</div><div style="font-size:.72rem;color:rgba(30,215,96,.5);margin-bottom:.75rem">Connecte Spotify pour voir ta musique</div><button class="btn-spotify" onclick="connectSpotify(event)">🎵 Connecter Spotify</button></div></div>
+        </div>
         <div class="widget full quote-widget">
           <div class="quote-text" id="h-quote"></div>
           <div class="quote-author" id="h-quote-author"></div>
@@ -527,6 +569,36 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);tran
       <div id="voice-notes-list"><div class="empty-state"><div class="empty-icon">🎙️</div><div class="empty-text">Aucune note encore.</div></div></div>
     </div>
 
+    <!-- BUCKET LIST -->
+    <div class="page" id="page-bucket">
+      <div class="section-title">🗺️ Bucket List</div>
+      <div class="bucket-stats" id="bucket-stats"></div>
+      <div class="add-obj-box">
+        <div style="font-family:'Syne',sans-serif;font-size:.85rem;font-weight:700;margin-bottom:12px">+ Nouveau rêve</div>
+        <div class="form-field" style="margin-bottom:10px"><div class="field-label">Rêve / Objectif de vie</div><input class="field-input" id="bucket-text" placeholder="Voyager au Japon, apprendre la guitare..."/></div>
+        <div class="field-label" style="margin-bottom:8px">Catégorie</div>
+        <div class="bucket-cats" id="bucket-cat-picker">
+          <div class="chip active" data-c="voyage" onclick="selectBucketCat(this)">✈️ Voyage</div>
+          <div class="chip" data-c="sport" onclick="selectBucketCat(this)">💪 Sport</div>
+          <div class="chip" data-c="culture" onclick="selectBucketCat(this)">🎭 Culture</div>
+          <div class="chip" data-c="perso" onclick="selectBucketCat(this)">🌱 Perso</div>
+          <div class="chip" data-c="social" onclick="selectBucketCat(this)">👥 Social</div>
+          <div class="chip" data-c="autre" onclick="selectBucketCat(this)">⭐ Autre</div>
+        </div>
+        <button class="btn btn-primary" style="width:100%;margin-top:12px" onclick="addBucket()">+ Ajouter</button>
+      </div>
+      <div class="cat-chips" id="bucket-filter-chips" style="margin-bottom:14px">
+        <div class="chip active" data-c="all" onclick="filterBucket(this)">Tous</div>
+        <div class="chip" data-c="voyage" onclick="filterBucket(this)">✈️</div>
+        <div class="chip" data-c="sport" onclick="filterBucket(this)">💪</div>
+        <div class="chip" data-c="culture" onclick="filterBucket(this)">🎭</div>
+        <div class="chip" data-c="perso" onclick="filterBucket(this)">🌱</div>
+        <div class="chip" data-c="social" onclick="filterBucket(this)">👥</div>
+        <div class="chip" data-c="autre" onclick="filterBucket(this)">⭐</div>
+      </div>
+      <div id="bucket-list"></div>
+    </div>
+
     <!-- NOTES RAPIDES -->
     <div class="page" id="page-notes">
       <div class="notes-toolbar">
@@ -542,6 +614,7 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);tran
     <div class="nav-btn" onclick="showPage('agenda')" id="nav-agenda"><div class="nav-icon">📅</div><div class="nav-label">Agenda</div></div>
     <div class="nav-btn" onclick="showPage('voice')" id="nav-voice"><div class="nav-icon">🎙️</div><div class="nav-label">Notes</div></div>
     <div class="nav-btn" onclick="showPage('objectifs')" id="nav-objectifs"><div class="nav-icon">🎯</div><div class="nav-label">Objectifs</div></div>
+    <div class="nav-btn" onclick="showPage('bucket')" id="nav-bucket"><div class="nav-icon">🗺️</div><div class="nav-label">Bucket</div></div>
   </div>
 </div>
 
@@ -659,6 +732,7 @@ onAuthStateChanged(auth, async user => {
     initWeather();
     // Auto-sync Google Calendar
     setTimeout(()=>syncGoogleCalendar(), 1500);
+    initSpotify();
 
     // Show Gemini prompt if no key saved
     if (!apiKey) {
@@ -739,10 +813,11 @@ function subscribeFirestore() {
   unsubListeners.forEach(u=>u()); unsubListeners=[];
 
   const cols = [
-    {name:'events',    setter: d=>{events=d;}},
-    {name:'objectives',setter: d=>{objectives=d;}},
-    {name:'voiceNotes',setter: d=>{voiceNotes=d;}},
-    {name:'stickies',  setter: d=>{stickies=d;}},
+    {name:'events',      setter: d=>{events=d;}},
+    {name:'objectives',  setter: d=>{objectives=d;}},
+    {name:'voiceNotes',  setter: d=>{voiceNotes=d;}},
+    {name:'stickies',    setter: d=>{stickies=d;}},
+    {name:'bucketItems', setter: d=>{bucketItems=d; renderBucket();}},
   ];
 
   cols.forEach(({name,setter}) => {
@@ -1008,7 +1083,7 @@ async function processTranscript(){
   isProcessing=true;setMicUI('processing');
   try{
     const prompt=`Tu es un assistant de productivité. Note vocale brute :\n"${transcript}"\nRéponds UNIQUEMENT en JSON valide, sans texte avant ou après :\n{"titre":"Titre court (max 8 mots)","resume":"Résumé en 2-3 phrases","points_cles":["Point 1"],"todo":["Action 1"]}\nSi pas de points ou tâches, mets [].`;
-    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:.3,maxOutputTokens:800}})});
+    const res=await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=${apiKey}`,{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({contents:[{parts:[{text:prompt}]}],generationConfig:{temperature:.3,maxOutputTokens:800}})});
     const data=await res.json();
     if(data.error) throw new Error(data.error.message);
     let raw=data.candidates?.[0]?.content?.parts?.[0]?.text||'';
@@ -1262,6 +1337,201 @@ function getAllEvents() {
   const gcalIds = new Set(gcalEvents.map(e=>e.id));
   // Local events + gcal events (no duplicates)
   return [...events, ...gcalEvents];
+}
+
+/* ── SPOTIFY ── */
+// Spotify uses PKCE auth flow — no backend needed
+const SP_CLIENT_ID = 'YOUR_SPOTIFY_CLIENT_ID'; // user fills this
+let spToken = null;
+let spRefreshInterval = null;
+
+function connectSpotify(e) {
+  if(e) e.stopPropagation();
+  // Check if client ID is set
+  if(SP_CLIENT_ID === 'YOUR_SPOTIFY_CLIENT_ID') {
+    showSpotifySetup();
+    return;
+  }
+  const redirectUri = encodeURIComponent(window.location.origin + window.location.pathname);
+  const scopes = encodeURIComponent('user-read-currently-playing user-read-playback-state user-modify-playback-state');
+  window.location.href = `https://accounts.spotify.com/authorize?client_id=${SP_CLIENT_ID}&response_type=token&redirect_uri=${redirectUri}&scope=${scopes}`;
+}
+
+function showSpotifySetup() {
+  const el = document.getElementById('sp-content');
+  el.innerHTML = `
+    <div class="sp-disconnected">
+      <div style="font-size:.75rem;color:rgba(30,215,96,.7);margin-bottom:.75rem;line-height:1.6">Pour connecter Spotify, crée une app gratuite sur<br/><a href="https://developer.spotify.com/dashboard" target="_blank" style="color:#1ed760">developer.spotify.com</a><br/>et entre ton Client ID ici :</div>
+      <input type="text" class="field-input" id="sp-client-id-input" placeholder="Client ID Spotify..." style="margin-bottom:.75rem;font-size:.72rem"/>
+      <button class="btn-spotify" onclick="saveSpotifyClientId()">Connecter →</button>
+    </div>`;
+}
+
+function saveSpotifyClientId() {
+  const id = document.getElementById('sp-client-id-input')?.value.trim();
+  if(!id) { showToast('Entre ton Client ID','error'); return; }
+  localStorage.setItem('sp_client_id', id);
+  window.location.href = `https://accounts.spotify.com/authorize?client_id=${id}&response_type=token&redirect_uri=${encodeURIComponent(window.location.origin+window.location.pathname)}&scope=${encodeURIComponent('user-read-currently-playing user-read-playback-state user-modify-playback-state')}`;
+}
+
+function initSpotify() {
+  // Check URL hash for token (after Spotify redirect)
+  const hash = window.location.hash;
+  if(hash.includes('access_token')) {
+    const params = new URLSearchParams(hash.substring(1));
+    spToken = params.get('access_token');
+    sessionStorage.setItem('sp_token', spToken);
+    // Clean URL
+    window.history.replaceState({}, document.title, window.location.pathname);
+  } else {
+    spToken = sessionStorage.getItem('sp_token');
+  }
+  if(spToken) {
+    fetchSpotifyNowPlaying();
+    if(spRefreshInterval) clearInterval(spRefreshInterval);
+    spRefreshInterval = setInterval(fetchSpotifyNowPlaying, 15000);
+  }
+}
+
+async function fetchSpotifyNowPlaying() {
+  if(!spToken) return;
+  try {
+    const res = await fetch('https://api.spotify.com/v1/me/player/currently-playing', {
+      headers: { Authorization: 'Bearer ' + spToken }
+    });
+    if(res.status === 401) {
+      spToken = null; sessionStorage.removeItem('sp_token');
+      renderSpotifyDisconnected(); return;
+    }
+    if(res.status === 204 || res.status === 200 && res.headers.get('content-length') === '0') {
+      renderSpotifyNotPlaying(); return;
+    }
+    const data = await res.json();
+    if(!data || !data.item) { renderSpotifyNotPlaying(); return; }
+    renderSpotifyPlaying(data);
+  } catch(e) { console.log('Spotify error:', e); }
+}
+
+function renderSpotifyPlaying(data) {
+  const el = document.getElementById('sp-content'); if(!el) return;
+  const track = data.item;
+  const isPlaying = data.is_playing;
+  const progress = data.progress_ms;
+  const duration = track.duration_ms;
+  const pct = Math.round((progress/duration)*100);
+  const cover = track.album?.images?.[0]?.url;
+  const artists = track.artists?.map(a=>a.name).join(', ');
+  el.innerHTML = `
+    <div class="sp-connected">
+      <div class="sp-track">
+        <div class="sp-cover">${cover?`<img src="${cover}"/>`:'🎵'}</div>
+        <div class="sp-info">
+          <div class="sp-title">${track.name}</div>
+          <div class="sp-artist">${artists}</div>
+          <div class="sp-progress"><div class="sp-progress-bar" style="width:${pct}%"></div></div>
+        </div>
+      </div>
+      <div class="sp-controls">
+        <button class="sp-btn" onclick="spControl('previous')">⏮</button>
+        <button class="sp-btn play" onclick="spControl('${isPlaying?'pause':'play'}')">${isPlaying?'⏸':'▶️'}</button>
+        <button class="sp-btn" onclick="spControl('next')">⏭</button>
+        <span style="font-size:.6rem;color:rgba(30,215,96,.4);margin-left:auto">${Math.floor(progress/60000)}:${String(Math.floor((progress%60000)/1000)).padStart(2,'0')} / ${Math.floor(duration/60000)}:${String(Math.floor((duration%60000)/1000)).padStart(2,'0')}</span>
+      </div>
+    </div>`;
+  document.getElementById('sp-refresh-lbl').textContent = isPlaying ? '🟢 En écoute' : '⏸ En pause';
+}
+
+function renderSpotifyNotPlaying() {
+  const el = document.getElementById('sp-content'); if(!el) return;
+  el.innerHTML = '<div class="sp-not-playing">🎵 Rien en lecture — lance Spotify sur ton appareil</div>';
+  document.getElementById('sp-refresh-lbl').textContent = '⏸ Inactif';
+}
+
+function renderSpotifyDisconnected() {
+  const el = document.getElementById('sp-content'); if(!el) return;
+  el.innerHTML = `<div class="sp-disconnected"><div style="font-size:.72rem;color:rgba(30,215,96,.5);margin-bottom:.75rem">Session expirée</div><button class="btn-spotify" onclick="connectSpotify(event)">🎵 Reconnecter</button></div>`;
+}
+
+async function spControl(action) {
+  if(!spToken) return;
+  const endpoints = {
+    play: ['PUT','https://api.spotify.com/v1/me/player/play'],
+    pause: ['PUT','https://api.spotify.com/v1/me/player/pause'],
+    next: ['POST','https://api.spotify.com/v1/me/player/next'],
+    previous: ['POST','https://api.spotify.com/v1/me/player/previous'],
+  };
+  const [method, url] = endpoints[action];
+  await fetch(url, { method, headers: { Authorization: 'Bearer '+spToken } });
+  setTimeout(fetchSpotifyNowPlaying, 500);
+}
+window.connectSpotify = connectSpotify;
+window.spControl = spControl;
+
+/* ── BUCKET LIST ── */
+let bucketItems = [];
+let selectedBucketCat = 'voyage';
+let bucketFilterCat = 'all';
+const BUCKET_CATS = {voyage:'✈️ Voyage',sport:'💪 Sport',culture:'🎭 Culture',perso:'🌱 Perso',social:'👥 Social',autre:'⭐ Autre'};
+
+window.selectBucketCat = (el) => {
+  document.querySelectorAll('#bucket-cat-picker .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); selectedBucketCat = el.dataset.c;
+};
+window.filterBucket = (el) => {
+  document.querySelectorAll('#bucket-filter-chips .chip').forEach(c=>c.classList.remove('active'));
+  el.classList.add('active'); bucketFilterCat = el.dataset.c; renderBucket();
+};
+window.addBucket = async () => {
+  const text = document.getElementById('bucket-text').value.trim();
+  if(!text) { showToast('Décris ton rêve !','error'); return; }
+  const item = {text, cat:selectedBucketCat, done:false, created:new Date().toISOString(), timestamp:new Date().toISOString()};
+  const id = await fsAdd('bucketItems', item);
+  if(id) {
+    bucketItems.unshift({...item,id});
+    document.getElementById('bucket-text').value = '';
+    renderBucket();
+    showToast('Rêve ajouté ! 🌟','success');
+  }
+};
+window.toggleBucket = async (id) => {
+  const b = bucketItems.find(x=>x.id===id); if(!b) return;
+  b.done = !b.done;
+  await fsUpdate('bucketItems', id, {done:b.done});
+  renderBucket();
+  if(b.done) showToast('Rêve accompli ! 🎉','success');
+};
+window.deleteBucket = async (id) => {
+  bucketItems = bucketItems.filter(x=>x.id!==id);
+  await fsDelete('bucketItems', id);
+  renderBucket();
+};
+function renderBucket() {
+  const filtered = bucketFilterCat==='all' ? bucketItems : bucketItems.filter(b=>b.cat===bucketFilterCat);
+  const el = document.getElementById('bucket-list'); if(!el) return;
+  if(!filtered.length) { el.innerHTML='<div class="empty-state"><div class="empty-icon">🗺️</div><div class="empty-text">Aucun rêve encore.<br/>Qu'est-ce que tu veux accomplir dans ta vie ?</div></div>'; }
+  else el.innerHTML = filtered.map(b=>`
+    <div class="bucket-item ${b.done?'done':''}">
+      <div class="bucket-check" onclick="toggleBucket('${b.id}')">${b.done?'✓':''}</div>
+      <div class="bucket-info">
+        <div class="bucket-text">${b.text}</div>
+        <div class="bucket-cat">${BUCKET_CATS[b.cat]||b.cat}</div>
+      </div>
+      <button class="bucket-del" onclick="deleteBucket('${b.id}')">✕</button>
+    </div>`).join('');
+  // Stats
+  const total=bucketItems.length, done=bucketItems.filter(b=>b.done).length;
+  const statsEl = document.getElementById('bucket-stats'); if(!statsEl) return;
+  statsEl.innerHTML = `
+    <div class="bstat"><div class="bstat-num" style="color:var(--accent)">${total}</div><div class="bstat-lbl">Rêves</div></div>
+    <div class="bstat"><div class="bstat-num" style="color:var(--accent3)">${done}</div><div class="bstat-lbl">Accomplis</div></div>
+    <div class="bstat"><div class="bstat-num" style="color:var(--accent2)">${total-done}</div><div class="bstat-lbl">À faire</div></div>`;
+}
+
+// Subscribe bucket to Firestore
+function subscribeBucket() {
+  if(!currentUser) return;
+  const { collection, query, where, onSnapshot } = window._fsImports || {};
+  // Use existing Firestore subscription pattern
 }
 
 /* ── TOAST ── */
