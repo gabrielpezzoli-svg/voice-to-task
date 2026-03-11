@@ -566,7 +566,7 @@ const provider = new GoogleAuthProvider();
 /* STATE */
 let currentUser = null, apiKey = '';
 let voiceNotes=[], events=[], objectives=[], stickies=[];
-let recognition=null, isRecording=false, isProcessing=false;
+let recognition=null, isRecording=false, isProcessing=false, manualStop=false;
 let transcript='', currentNoteId=null;
 let calDate=new Date(), selectedEvtColor='#9b8afb', selectedObjPeriod='jour';
 let filterPeriod='all', selNoteColor='#f0c14b';
@@ -836,15 +836,16 @@ function renderHomeCal() {
 
 function renderHomeStats() {
   document.getElementById('h-obj-count').textContent=objectives.filter(o=>o.period==='jour'&&!o.done).length;
-  document.getElementById('h-evt-count').textContent=events.filter(e=>new Date(e.date)>=new Date()).length;
+  const todayStr=new Date().toISOString().split('T')[0];
+  document.getElementById('h-evt-count').textContent=events.filter(e=>e.date>=todayStr).length;
   const q=QUOTES[new Date().getDay()%QUOTES.length];
   document.getElementById('h-quote').textContent='"'+q.text+'"';
   document.getElementById('h-quote-author').textContent=q.author;
 }
 
 function renderHomeUpcoming() {
-  const now=new Date();
-  const list=events.filter(e=>new Date(e.date)>=now).sort((a,b)=>new Date(a.date)-new Date(b.date)).slice(0,3);
+  const todayStr=new Date().toISOString().split('T')[0];
+  const list=events.filter(e=>e.date>=todayStr).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3);
   const el=document.getElementById('h-upcoming-list');
   if(!list.length){el.innerHTML='<div style="font-size:.72rem;color:var(--muted)">Aucun événement à venir</div>';return;}
   el.innerHTML='<div class="upcoming-list">'+list.map(ev=>`<div class="upcoming-item"><div class="upcoming-dot-bar" style="background:${ev.color||'#9b8afb'}"></div><div><div class="ui-title">${ev.title}</div><div class="ui-date">${new Date(ev.date).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})}${ev.time?' · '+ev.time:''}</div></div></div>`).join('')+'</div>';
@@ -949,14 +950,29 @@ function startRecording(){
   const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
   if(!SR){showToast('Utilise Chrome pour la reconnaissance vocale.','error');return;}
   recognition=new SR();recognition.lang='fr-FR';recognition.continuous=true;recognition.interimResults=true;
-  transcript='';
-  recognition.onresult=e=>{transcript=Array.from(e.results).map(r=>r[0].transcript).join(' ');};
-  recognition.onerror=e=>{showToast('Erreur micro : '+e.error,'error');resetRecorder();};
-  recognition.onend=()=>{if(isRecording) processTranscript();};
+  transcript=''; manualStop=false;
+  recognition.onresult=e=>{
+    transcript=Array.from(e.results).map(r=>r[0].transcript).join(' ');
+  };
+  recognition.onerror=e=>{
+    if(e.error==='aborted') return; // normal quand on stop() manuellement
+    showToast('Erreur micro : '+e.error,'error');
+    resetRecorder();
+  };
+  recognition.onend=()=>{
+    if(isProcessing) return;
+    isRecording=false;
+    processTranscript();
+  };
   recognition.start();isRecording=true;setMicUI('recording');
 }
-function stopRecording(){isRecording=false;if(recognition) recognition.stop();}
-function resetRecorder(){isRecording=false;isProcessing=false;setMicUI('idle');}
+function stopRecording(){
+  manualStop=true;
+  isRecording=false;
+  setMicUI('processing');
+  if(recognition) recognition.stop();
+}
+function resetRecorder(){isRecording=false;isProcessing=false;manualStop=false;setMicUI('idle');}
 async function processTranscript(){
   if(!transcript.trim()){showToast('Aucun texte détecté.','error');resetRecorder();return;}
   if(!apiKey){showToast('Configure ta clé Gemini ⚙️','error');showGeminiPrompt();resetRecorder();return;}
@@ -970,10 +986,21 @@ async function processTranscript(){
     raw=raw.replace(/```json|```/g,'').trim();
     const p=JSON.parse(raw);
     const note={titre:p.titre||'Note sans titre',resume:p.resume||'',points_cles:p.points_cles||[],todo:(p.todo||[]).map(t=>({text:t,done:false})),transcript,timestamp:new Date().toISOString()};
-    const id=await fsAdd('voiceNotes',note);
-    if(id) showToast('Note créée ! ✨','success');
-  }catch(e){showToast('Erreur IA : '+e.message,'error');}
-  resetRecorder();
+    const newId=await fsAdd('voiceNotes',note);
+    resetRecorder();
+    if(newId){
+      // Ajout local immédiat avant sync Firestore
+      const localNote={...note,id:newId};
+      if(!voiceNotes.find(x=>x.id===newId)) voiceNotes.unshift(localNote);
+      renderAll();
+      showToast('Note créée ! ✨ Résumé prêt','success');
+      // Ouvre automatiquement la modal du résumé
+      setTimeout(()=>openNoteModal(newId),350);
+    }
+  }catch(e){
+    showToast('Erreur IA : '+e.message,'error');
+    resetRecorder();
+  }
 }
 function renderVoiceStats(){
   document.getElementById('vt-total').textContent=voiceNotes.length;
