@@ -444,7 +444,10 @@ body{font-family:'DM Mono',monospace;background:var(--bg);color:var(--text);tran
 
     <!-- AGENDA -->
     <div class="page" id="page-agenda">
-      <div class="section-title">📅 Agenda</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+        <div class="section-title" style="margin-bottom:0">📅 Agenda</div>
+        <button class="btn btn-primary" style="font-size:.7rem;padding:7px 14px" onclick="syncGoogleCalendar()">🔄 Sync Google</button>
+      </div>
       <div class="full-cal">
         <div class="cal-header">
           <button class="cal-nav-btn" onclick="changeMonth(-1)">‹</button>
@@ -654,6 +657,8 @@ onAuthStateChanged(auth, async user => {
     renderAll();
     showSyncBadge();
     initWeather();
+    // Auto-sync Google Calendar
+    setTimeout(()=>syncGoogleCalendar(), 1500);
 
     // Show Gemini prompt if no key saved
     if (!apiKey) {
@@ -679,7 +684,14 @@ function updateGeminiStatus() {
 window.signInGoogle = async () => {
   try {
     document.getElementById('loading-overlay').classList.remove('hidden');
-    await signInWithPopup(auth, provider);
+    // Request Google Calendar read access
+    provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+    const result = await signInWithPopup(auth, provider);
+    // Save Google access token for Calendar API
+    const credential = GoogleAuthProvider.credentialFromResult(result);
+    if(credential?.accessToken) {
+      sessionStorage.setItem('gAccessToken', credential.accessToken);
+    }
   } catch(e) {
     document.getElementById('loading-overlay').classList.add('hidden');
     showToast('Erreur : '+e.message,'error');
@@ -842,7 +854,7 @@ function renderHomeCal() {
   for(let i=0;i<7;i++){
     const d=new Date(start); d.setDate(start.getDate()+i);
     const isToday=d.toDateString()===now.toDateString();
-    const hasEv=events.some(e=>new Date(e.date).toDateString()===d.toDateString());
+    const hasEv=getAllEvents().some(e=>new Date(e.date).toDateString()===d.toDateString());
     mini.innerHTML+=`<div class="cal-mini-d ${isToday?'today':''} ${hasEv&&!isToday?'has-ev':''}"><div class="dm-n">${dayShort[d.getDay()]}</div><div class="dm-d">${d.getDate()}</div></div>`;
   }
   const upcoming=events.filter(e=>new Date(e.date)>=now).sort((a,b)=>new Date(a.date)-new Date(b.date));
@@ -854,7 +866,7 @@ function renderHomeCal() {
 function renderHomeStats() {
   document.getElementById('h-obj-count').textContent=objectives.filter(o=>o.period==='jour'&&!o.done).length;
   const todayStr=new Date().toISOString().split('T')[0];
-  document.getElementById('h-evt-count').textContent=events.filter(e=>e.date>=todayStr).length;
+  document.getElementById('h-evt-count').textContent=getAllEvents().filter(e=>e.date>=todayStr).length;
   const q=QUOTES[new Date().getDay()%QUOTES.length];
   document.getElementById('h-quote').textContent='"'+q.text+'"';
   document.getElementById('h-quote-author').textContent=q.author;
@@ -862,7 +874,7 @@ function renderHomeStats() {
 
 function renderHomeUpcoming() {
   const todayStr=new Date().toISOString().split('T')[0];
-  const list=events.filter(e=>e.date>=todayStr).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3);
+  const list=getAllEvents().filter(e=>e.date>=todayStr).sort((a,b)=>a.date.localeCompare(b.date)).slice(0,3);
   const el=document.getElementById('h-upcoming-list');
   if(!list.length){el.innerHTML='<div style="font-size:.72rem;color:var(--muted)">Aucun événement à venir</div>';return;}
   el.innerHTML='<div class="upcoming-list">'+list.map(ev=>`<div class="upcoming-item"><div class="upcoming-dot-bar" style="background:${ev.color||'#9b8afb'}"></div><div><div class="ui-title">${ev.title}</div><div class="ui-date">${new Date(ev.date).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short'})}${ev.time?' · '+ev.time:''}</div></div></div>`).join('')+'</div>';
@@ -901,7 +913,7 @@ function renderFullCal() {
   for(let d=1;d<=dim;d++){
     const date=new Date(calDate.getFullYear(),calDate.getMonth(),d);
     const isToday=date.toDateString()===today.toDateString();
-    const hasEv=events.some(e=>new Date(e.date).toDateString()===date.toDateString());
+    const hasEv=getAllEvents().some(e=>new Date(e.date).toDateString()===date.toDateString());
     grid.innerHTML+=`<div class="cal-cell ${isToday?'today':''} ${hasEv?'has-event':''}" onclick="selectCalDate('${date.toISOString().split('T')[0]}')">${d}</div>`;
   }
 }
@@ -924,9 +936,9 @@ window.addEvent=async()=>{
 window.deleteEvent=async(id)=>{await fsDelete('events',id);showToast('Supprimé.','');};
 function renderEventsList(){
   const el=document.getElementById('events-list');
-  const sorted=[...events].sort((a,b)=>new Date(a.date)-new Date(b.date));
+  const sorted=[...getAllEvents()].sort((a,b)=>new Date(a.date)-new Date(b.date));
   if(!sorted.length){el.innerHTML='<div class="empty-state"><div class="empty-icon">📅</div><div class="empty-text">Aucun événement.</div></div>';return;}
-  el.innerHTML=sorted.map(ev=>`<div class="event-item"><div class="ev-bar" style="background:${ev.color||'#9b8afb'}"></div><div class="ev-info"><div class="ev-title">${ev.title}</div><div class="ev-meta"><span>${new Date(ev.date).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</span>${ev.time?`<span>${ev.time}</span>`:''}</div>${ev.note?`<div class="ev-note">${ev.note}</div>`:''}</div><button class="ev-del" onclick="deleteEvent('${ev.id}')">✕</button></div>`).join('');
+  el.innerHTML=sorted.map(ev=>`<div class="event-item"><div class="ev-bar" style="background:${ev.color||'#9b8afb'}"></div><div class="ev-info"><div class="ev-title">${ev.fromGoogle?'📅 ':''}${ev.title}</div><div class="ev-meta"><span>${new Date(ev.date).toLocaleDateString('fr-FR',{weekday:'short',day:'numeric',month:'short',year:'numeric'})}</span>${ev.time?`<span>${ev.time}</span>`:''}</div>${ev.note?`<div class="ev-note">${ev.note}</div>`:''}</div><button class="ev-del" onclick="deleteEvent('${ev.id}')">✕</button></div>`).join('');
 }
 
 /* ── OBJECTIVES ── */
@@ -1178,6 +1190,79 @@ function renderWeather(cur, city) {
 }
 
 window.refreshWeather = () => initWeather();
+
+/* ── GOOGLE CALENDAR ── */
+let gcalEvents = [];
+
+async function syncGoogleCalendar() {
+  let token = sessionStorage.getItem('gAccessToken');
+  
+  // If no token in session, try to get a fresh one
+  if(!token && auth.currentUser) {
+    try {
+      // Re-authenticate silently to get fresh token
+      provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+      const result = await signInWithPopup(auth, provider);
+      const credential = GoogleAuthProvider.credentialFromResult(result);
+      token = credential?.accessToken;
+      if(token) sessionStorage.setItem('gAccessToken', token);
+    } catch(e) {
+      console.log('Could not get Calendar token:', e.message);
+      return;
+    }
+  }
+  
+  if(!token) return;
+
+  try {
+    setSyncing(true);
+    // Fetch events from now to 3 months ahead
+    const now = new Date().toISOString();
+    const future = new Date(Date.now() + 90*24*3600*1000).toISOString();
+    const url = `https://www.googleapis.com/calendar/v3/calendars/primary/events?timeMin=${now}&timeMax=${future}&singleEvents=true&orderBy=startTime&maxResults=50`;
+    
+    const res = await fetch(url, {
+      headers: { Authorization: 'Bearer ' + token }
+    });
+    
+    if(res.status === 401) {
+      // Token expired
+      sessionStorage.removeItem('gAccessToken');
+      showToast('Session Google expirée — reconnecte-toi','error');
+      setSyncing(false);
+      return;
+    }
+    
+    const data = await res.json();
+    if(data.error) throw new Error(data.error.message);
+    
+    gcalEvents = (data.items || []).map(ev => ({
+      id: 'gcal_' + ev.id,
+      title: ev.summary || '(Sans titre)',
+      date: (ev.start?.date || ev.start?.dateTime || '').split('T')[0],
+      time: ev.start?.dateTime ? ev.start.dateTime.split('T')[1]?.slice(0,5) : '',
+      note: ev.description || '',
+      color: '#60a5fa',
+      fromGoogle: true,
+      timestamp: ev.start?.dateTime || ev.start?.date || ''
+    })).filter(e => e.date);
+    
+    setSyncing(false);
+    renderAll();
+    showToast('📅 '+gcalEvents.length+' événements Google importés','success');
+  } catch(e) {
+    setSyncing(false);
+    console.error('GCal error:', e);
+    showToast('Erreur Google Calendar : '+e.message,'error');
+  }
+}
+
+// Merge local + gcal events for display
+function getAllEvents() {
+  const gcalIds = new Set(gcalEvents.map(e=>e.id));
+  // Local events + gcal events (no duplicates)
+  return [...events, ...gcalEvents];
+}
 
 /* ── TOAST ── */
 function showToast(msg,type=''){
