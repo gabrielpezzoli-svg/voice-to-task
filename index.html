@@ -758,17 +758,18 @@ function updateGeminiStatus() {
 window.signInGoogle = async () => {
   try {
     document.getElementById('loading-overlay').classList.remove('hidden');
-    // Request Google Calendar read access
-    provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
-    const result = await signInWithPopup(auth, provider);
-    // Save Google access token for Calendar API
+    // Fresh provider each time to avoid scope accumulation
+    const loginProvider = new GoogleAuthProvider();
+    loginProvider.addScope('https://www.googleapis.com/auth/calendar.readonly');
+    const result = await signInWithPopup(auth, loginProvider);
     const credential = GoogleAuthProvider.credentialFromResult(result);
     if(credential?.accessToken) {
       sessionStorage.setItem('gAccessToken', credential.accessToken);
     }
   } catch(e) {
     document.getElementById('loading-overlay').classList.add('hidden');
-    showToast('Erreur : '+e.message,'error');
+    if(e.code==='auth/cancelled-popup-request'||e.code==='auth/popup-closed-by-user') return;
+    showToast('Erreur connexion : '+e.message,'error');
   }
 };
 
@@ -1272,19 +1273,10 @@ let gcalEvents = [];
 async function syncGoogleCalendar() {
   let token = sessionStorage.getItem('gAccessToken');
   
-  // If no token in session, try to get a fresh one
-  if(!token && auth.currentUser) {
-    try {
-      // Re-authenticate silently to get fresh token
-      provider.addScope('https://www.googleapis.com/auth/calendar.readonly');
-      const result = await signInWithPopup(auth, provider);
-      const credential = GoogleAuthProvider.credentialFromResult(result);
-      token = credential?.accessToken;
-      if(token) sessionStorage.setItem('gAccessToken', token);
-    } catch(e) {
-      console.log('Could not get Calendar token:', e.message);
-      return;
-    }
+  // If no token, can't sync silently - user must reconnect
+  if(!token) {
+    console.log('No Calendar token - user needs to reconnect');
+    return;
   }
   
   if(!token) return;
