@@ -1,4 +1,5 @@
 <!DOCTYPE html>
+
 <html lang="fr">
 <head>
 <meta charset="UTF-8">
@@ -22,794 +23,796 @@
     --accent: #1DB954;
   }
 
-  * { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-
-  body {
-    background: var(--bg);
-    color: var(--text);
-    font-family: 'Syne', sans-serif;
-    min-height: 100vh;
-    min-height: -webkit-fill-available;
-    overflow-x: hidden;
-  }
-
-  /* BACKGROUND MESH */
-  body::before {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background:
-      radial-gradient(ellipse 60% 40% at 20% 10%, rgba(29,185,84,0.07) 0%, transparent 60%),
-      radial-gradient(ellipse 40% 60% at 80% 80%, rgba(29,185,84,0.05) 0%, transparent 60%);
-    pointer-events: none;
-    z-index: 0;
-  }
-
-  /* GRID NOISE */
-  body::after {
-    content: '';
-    position: fixed;
-    inset: 0;
-    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
-    pointer-events: none;
-    z-index: 0;
-    opacity: 0.4;
-  }
-
-  #app { position: relative; z-index: 1; }
-
-  /* ─── SETUP SCREEN ─── */
-  #setup-screen {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100svh;
-    padding: 2rem;
-    text-align: center;
-  }
-
-  .setup-logo {
-    width: 72px;
-    height: 72px;
-    background: var(--green);
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    margin: 0 auto 2rem;
-    box-shadow: 0 0 40px rgba(29,185,84,0.4);
-    animation: pulse 3s ease-in-out infinite;
-  }
-
-  @keyframes pulse {
-    0%, 100% { box-shadow: 0 0 40px rgba(29,185,84,0.4); }
-    50% { box-shadow: 0 0 60px rgba(29,185,84,0.6); }
-  }
-
-  .setup-logo svg { width: 36px; height: 36px; fill: white; }
-
-  .setup-title {
-    font-size: 2.2rem;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    margin-bottom: 0.5rem;
-    background: linear-gradient(135deg, #fff 30%, var(--green));
-    -webkit-background-clip: text;
-    -webkit-text-fill-color: transparent;
-  }
-
-  .setup-subtitle {
-    color: var(--muted);
-    font-size: 0.95rem;
-    margin-bottom: 2.5rem;
-    font-family: 'Space Mono', monospace;
-    line-height: 1.6;
-  }
-
-  .setup-card {
-    background: var(--surface);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 20px;
-    padding: 1.5rem;
-    width: 100%;
-    max-width: 400px;
-    margin-bottom: 1rem;
-    text-align: left;
-  }
-
-  .setup-card label {
-    display: block;
-    font-size: 0.7rem;
-    font-family: 'Space Mono', monospace;
-    color: var(--green);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 0.5rem;
-  }
-
-  .setup-card input {
-    width: 100%;
-    background: var(--surface2);
-    border: 1px solid rgba(255,255,255,0.08);
-    border-radius: 10px;
-    padding: 0.75rem 1rem;
-    color: var(--text);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.85rem;
-    outline: none;
-    transition: border-color 0.2s;
-  }
-
-  .setup-card input:focus { border-color: var(--green); }
-
-  .steps {
-    background: var(--surface);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 20px;
-    padding: 1.5rem;
-    width: 100%;
-    max-width: 400px;
-    margin-bottom: 1.5rem;
-    text-align: left;
-  }
-
-  .steps-title {
-    font-size: 0.7rem;
-    font-family: 'Space Mono', monospace;
-    color: var(--muted);
-    letter-spacing: 0.1em;
-    text-transform: uppercase;
-    margin-bottom: 1rem;
-  }
-
-  .step {
-    display: flex;
-    gap: 0.75rem;
-    margin-bottom: 0.75rem;
-    align-items: flex-start;
-    font-size: 0.85rem;
-    color: var(--muted);
-    line-height: 1.4;
-  }
-
-  .step-num {
-    background: var(--surface3);
-    color: var(--green);
-    border-radius: 50%;
-    width: 20px;
-    height: 20px;
-    min-width: 20px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.65rem;
-    font-family: 'Space Mono', monospace;
-    font-weight: 700;
-    margin-top: 0.1rem;
-  }
-
-  .step a { color: var(--green); }
-
-  .btn-connect {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.6rem;
-    width: 100%;
-    max-width: 400px;
-    padding: 1rem;
-    background: var(--green);
-    border: none;
-    border-radius: 100px;
-    color: #000;
-    font-family: 'Syne', sans-serif;
-    font-size: 1rem;
-    font-weight: 700;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: -0.01em;
-  }
-
-  .btn-connect:active { transform: scale(0.97); background: var(--green-dim); }
-
-  /* ─── LOADING ─── */
-  #loading {
-    display: none;
-    flex-direction: column;
-    align-items: center;
-    justify-content: center;
-    min-height: 100svh;
-    gap: 1.5rem;
-  }
-
-  .spinner {
-    width: 48px;
-    height: 48px;
-    border: 3px solid rgba(29,185,84,0.15);
-    border-top-color: var(--green);
-    border-radius: 50%;
-    animation: spin 0.8s linear infinite;
-  }
-
-  @keyframes spin { to { transform: rotate(360deg); } }
-
-  .loading-text {
-    font-family: 'Space Mono', monospace;
-    color: var(--muted);
-    font-size: 0.8rem;
-    letter-spacing: 0.1em;
-  }
-
-  /* ─── MAIN APP ─── */
-  #main-app { display: none; padding-bottom: 5rem; }
-
-  /* HEADER */
-  .header {
-    padding: 3.5rem 1.5rem 1.5rem;
-    display: flex;
-    align-items: flex-start;
-    justify-content: space-between;
-    gap: 1rem;
-  }
-
-  .header-left {}
-
-  .header-greeting {
-    font-size: 0.7rem;
-    font-family: 'Space Mono', monospace;
-    color: var(--green);
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 0.25rem;
-  }
-
-  .header-name {
-    font-size: 1.8rem;
-    font-weight: 800;
-    letter-spacing: -0.04em;
-    line-height: 1.1;
-  }
-
-  .avatar {
-    width: 48px;
-    height: 48px;
-    border-radius: 50%;
-    border: 2px solid var(--green);
-    object-fit: cover;
-    flex-shrink: 0;
-    background: var(--surface2);
-  }
-
-  /* STATS GRID */
-  .stats-row {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-    padding: 0 1.5rem 1.5rem;
-  }
-
-  .stat-card {
-    background: var(--surface);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 18px;
-    padding: 1.25rem;
-    position: relative;
-    overflow: hidden;
-  }
-
-  .stat-card::before {
-    content: '';
-    position: absolute;
-    top: 0; right: 0;
-    width: 60px; height: 60px;
-    background: radial-gradient(circle, rgba(29,185,84,0.15) 0%, transparent 70%);
-  }
-
-  .stat-label {
-    font-size: 0.6rem;
-    font-family: 'Space Mono', monospace;
-    color: var(--muted);
-    letter-spacing: 0.12em;
-    text-transform: uppercase;
-    margin-bottom: 0.4rem;
-  }
-
-  .stat-value {
-    font-size: 1.6rem;
-    font-weight: 800;
-    letter-spacing: -0.05em;
-    color: var(--text);
-    line-height: 1;
-  }
-
-  .stat-value span {
-    font-size: 0.75rem;
-    font-weight: 400;
-    color: var(--muted);
-    letter-spacing: 0;
-    font-family: 'Space Mono', monospace;
-  }
-
-  .stat-sub {
-    font-size: 0.68rem;
-    color: var(--green);
-    font-family: 'Space Mono', monospace;
-    margin-top: 0.25rem;
-  }
-
-  /* SECTION */
-  .section {
-    padding: 0 1.5rem 1.5rem;
-  }
-
-  .section-header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    margin-bottom: 1rem;
-  }
-
-  .section-title {
-    font-size: 1.1rem;
-    font-weight: 700;
-    letter-spacing: -0.03em;
-  }
-
-  .section-badge {
-    font-size: 0.6rem;
-    font-family: 'Space Mono', monospace;
-    color: var(--green);
-    background: rgba(29,185,84,0.1);
-    border: 1px solid rgba(29,185,84,0.2);
-    padding: 0.2rem 0.5rem;
-    border-radius: 100px;
-    letter-spacing: 0.08em;
-  }
-
-  /* TIME RANGE TABS */
-  .tabs {
-    display: flex;
-    gap: 0.4rem;
-    padding: 0 1.5rem 1rem;
-    overflow-x: auto;
-    scrollbar-width: none;
-  }
-  .tabs::-webkit-scrollbar { display: none; }
-
-  .tab {
-    flex-shrink: 0;
-    padding: 0.45rem 0.9rem;
-    border-radius: 100px;
-    border: 1px solid rgba(255,255,255,0.08);
-    background: transparent;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    cursor: pointer;
-    transition: all 0.2s;
-    letter-spacing: 0.05em;
-  }
-
-  .tab.active {
-    background: var(--green);
-    border-color: var(--green);
-    color: #000;
-    font-weight: 700;
-  }
-
-  /* TRACK LIST */
-  .track-list { display: flex; flex-direction: column; gap: 0.5rem; }
-
-  .track-item {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    background: var(--surface);
-    border: 1px solid rgba(255,255,255,0.04);
-    border-radius: 14px;
-    padding: 0.75rem;
-    transition: all 0.15s;
-    text-decoration: none;
-    color: inherit;
-    animation: fadeUp 0.4s ease both;
-  }
-
-  @keyframes fadeUp {
-    from { opacity: 0; transform: translateY(12px); }
-    to { opacity: 1; transform: translateY(0); }
-  }
-
-  .track-rank {
-    font-family: 'Space Mono', monospace;
-    font-size: 0.7rem;
-    color: var(--muted);
-    min-width: 18px;
-    text-align: center;
-  }
-
-  .track-rank.top3 { color: var(--green); font-weight: 700; }
-
-  .track-img {
-    width: 44px;
-    height: 44px;
-    border-radius: 8px;
-    object-fit: cover;
-    background: var(--surface2);
-    flex-shrink: 0;
-  }
-
-  .track-info { flex: 1; min-width: 0; }
-
-  .track-name {
-    font-size: 0.9rem;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    letter-spacing: -0.01em;
-  }
-
-  .track-artist {
-    font-size: 0.72rem;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 0.15rem;
-  }
-
-  .track-pop {
-    display: flex;
-    flex-direction: column;
-    align-items: flex-end;
-    gap: 0.2rem;
-    flex-shrink: 0;
-  }
-
-  .pop-bar {
-    width: 32px;
-    height: 3px;
-    background: var(--surface3);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .pop-fill {
-    height: 100%;
-    background: var(--green);
-    border-radius: 2px;
-    transition: width 0.6s ease;
-  }
-
-  .pop-num {
-    font-size: 0.6rem;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-  }
-
-  /* ARTIST LIST */
-  .artist-grid {
-    display: grid;
-    grid-template-columns: repeat(2, 1fr);
-    gap: 0.75rem;
-  }
-
-  .artist-card {
-    background: var(--surface);
-    border: 1px solid rgba(255,255,255,0.04);
-    border-radius: 16px;
-    padding: 1rem;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    text-align: center;
-    gap: 0.5rem;
-    animation: fadeUp 0.4s ease both;
-  }
-
-  .artist-img {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    object-fit: cover;
-    background: var(--surface2);
-    border: 2px solid rgba(29,185,84,0.2);
-  }
-
-  .artist-rank {
-    position: absolute;
-    top: -4px;
-    right: -4px;
-    background: var(--green);
-    color: #000;
-    font-size: 0.6rem;
-    font-weight: 700;
-    font-family: 'Space Mono', monospace;
-    width: 18px;
-    height: 18px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-  }
-
-  .artist-img-wrap { position: relative; }
-
-  .artist-name {
-    font-size: 0.8rem;
-    font-weight: 700;
-    letter-spacing: -0.02em;
-    line-height: 1.2;
-  }
-
-  .artist-genre {
-    font-size: 0.6rem;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-  }
-
-  /* RECENTLY PLAYED */
-  .recent-item {
-    display: flex;
-    align-items: center;
-    gap: 0.9rem;
-    padding: 0.6rem 0;
-    border-bottom: 1px solid rgba(255,255,255,0.04);
-    animation: fadeUp 0.3s ease both;
-  }
-
-  .recent-item:last-child { border-bottom: none; }
-
-  .recent-img {
-    width: 40px;
-    height: 40px;
-    border-radius: 6px;
-    object-fit: cover;
-    background: var(--surface2);
-    flex-shrink: 0;
-  }
-
-  .recent-info { flex: 1; min-width: 0; }
-
-  .recent-name {
-    font-size: 0.85rem;
-    font-weight: 600;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-
-  .recent-artist {
-    font-size: 0.7rem;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    margin-top: 0.1rem;
-  }
-
-  .recent-time {
-    font-size: 0.6rem;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    flex-shrink: 0;
-  }
-
-  /* GENRE CHART */
-  .genre-list { display: flex; flex-direction: column; gap: 0.6rem; }
-
-  .genre-item { display: flex; flex-direction: column; gap: 0.3rem; }
-
-  .genre-row {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-  }
-
-  .genre-name {
-    font-size: 0.8rem;
-    font-weight: 600;
-    text-transform: capitalize;
-  }
-
-  .genre-pct {
-    font-size: 0.65rem;
-    color: var(--green);
-    font-family: 'Space Mono', monospace;
-  }
-
-  .genre-bar {
-    height: 4px;
-    background: var(--surface2);
-    border-radius: 2px;
-    overflow: hidden;
-  }
-
-  .genre-fill {
-    height: 100%;
-    background: linear-gradient(90deg, var(--green), #00e676);
-    border-radius: 2px;
-    transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
-  }
-
-  /* NOW PLAYING */
-  .now-playing {
-    background: linear-gradient(135deg, rgba(29,185,84,0.12), rgba(29,185,84,0.04));
-    border: 1px solid rgba(29,185,84,0.2);
-    border-radius: 20px;
-    padding: 1.25rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-    margin: 0 1.5rem 1.5rem;
-  }
-
-  .now-img {
-    width: 56px;
-    height: 56px;
-    border-radius: 10px;
-    object-fit: cover;
-    animation: rotateLP 8s linear infinite;
-    border-radius: 50%;
-    border: 3px solid var(--green);
-  }
-
-  @keyframes rotateLP {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-  }
-
-  .now-info { flex: 1; min-width: 0; }
-
-  .now-label {
-    font-size: 0.6rem;
-    color: var(--green);
-    font-family: 'Space Mono', monospace;
-    letter-spacing: 0.15em;
-    text-transform: uppercase;
-    margin-bottom: 0.25rem;
-    display: flex;
-    align-items: center;
-    gap: 0.3rem;
-  }
-
-  .now-dot {
-    width: 6px;
-    height: 6px;
-    background: var(--green);
-    border-radius: 50%;
-    animation: blink 1s ease-in-out infinite;
-  }
-
-  @keyframes blink {
-    0%, 100% { opacity: 1; }
-    50% { opacity: 0.2; }
-  }
-
-  .now-name {
-    font-size: 0.95rem;
-    font-weight: 700;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-    letter-spacing: -0.02em;
-  }
-
-  .now-artist {
-    font-size: 0.72rem;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    margin-top: 0.1rem;
-  }
-
-  /* BOTTOM NAV */
-  .bottom-nav {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    right: 0;
-    background: rgba(6,10,15,0.85);
-    backdrop-filter: blur(20px);
-    -webkit-backdrop-filter: blur(20px);
-    border-top: 1px solid rgba(255,255,255,0.06);
-    display: flex;
-    padding: 0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom));
-    z-index: 100;
-  }
-
-  .nav-btn {
-    flex: 1;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.3rem;
-    background: none;
-    border: none;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    font-size: 0.55rem;
-    cursor: pointer;
-    padding: 0.3rem 0;
-    transition: color 0.2s;
-    letter-spacing: 0.06em;
-    text-transform: uppercase;
-  }
-
-  .nav-btn.active { color: var(--green); }
-  .nav-btn svg { width: 20px; height: 20px; }
-
-  /* PAGES */
-  .page { display: none; }
-  .page.active { display: block; }
-
-  /* LOGOUT */
-  .logout-btn {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    margin: 1rem 1.5rem;
-    padding: 0.75rem;
-    background: rgba(255,59,48,0.08);
-    border: 1px solid rgba(255,59,48,0.15);
-    border-radius: 12px;
-    color: #ff3b30;
-    font-family: 'Space Mono', monospace;
-    font-size: 0.75rem;
-    cursor: pointer;
-    letter-spacing: 0.05em;
-  }
-
-  .user-card {
-    background: var(--surface);
-    border: 1px solid rgba(255,255,255,0.06);
-    border-radius: 20px;
-    padding: 1.5rem;
-    margin: 0 1.5rem 1.5rem;
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-  }
-
-  .user-avatar-lg {
-    width: 64px;
-    height: 64px;
-    border-radius: 50%;
-    border: 2px solid var(--green);
-    object-fit: cover;
-  }
-
-  .user-meta {}
-  .user-name-lg { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.03em; }
-  .user-followers {
-    font-size: 0.7rem;
-    color: var(--muted);
-    font-family: 'Space Mono', monospace;
-    margin-top: 0.2rem;
-  }
-
-  .error-msg {
-    background: rgba(255,59,48,0.08);
-    border: 1px solid rgba(255,59,48,0.2);
-    border-radius: 12px;
-    padding: 1rem;
-    margin: 0 1.5rem;
-    font-size: 0.8rem;
-    color: #ff6b6b;
-    font-family: 'Space Mono', monospace;
-    line-height: 1.5;
-  }
+- { margin: 0; padding: 0; box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+body {
+background: var(–bg);
+color: var(–text);
+font-family: ‘Syne’, sans-serif;
+min-height: 100vh;
+min-height: -webkit-fill-available;
+overflow-x: hidden;
+}
+
+/* BACKGROUND MESH */
+body::before {
+content: ‘’;
+position: fixed;
+inset: 0;
+background:
+radial-gradient(ellipse 60% 40% at 20% 10%, rgba(29,185,84,0.07) 0%, transparent 60%),
+radial-gradient(ellipse 40% 60% at 80% 80%, rgba(29,185,84,0.05) 0%, transparent 60%);
+pointer-events: none;
+z-index: 0;
+}
+
+/* GRID NOISE */
+body::after {
+content: ‘’;
+position: fixed;
+inset: 0;
+background-image: url(“data:image/svg+xml,%3Csvg viewBox=‘0 0 256 256’ xmlns=‘http://www.w3.org/2000/svg’%3E%3Cfilter id=‘noise’%3E%3CfeTurbulence type=‘fractalNoise’ baseFrequency=‘0.9’ numOctaves=‘4’ stitchTiles=‘stitch’/%3E%3C/filter%3E%3Crect width=‘100%25’ height=‘100%25’ filter=‘url(%23noise)’ opacity=‘0.03’/%3E%3C/svg%3E”);
+pointer-events: none;
+z-index: 0;
+opacity: 0.4;
+}
+
+#app { position: relative; z-index: 1; }
+
+/* ─── SETUP SCREEN ─── */
+#setup-screen {
+display: flex;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+min-height: 100svh;
+padding: 2rem;
+text-align: center;
+}
+
+.setup-logo {
+width: 72px;
+height: 72px;
+background: var(–green);
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+margin: 0 auto 2rem;
+box-shadow: 0 0 40px rgba(29,185,84,0.4);
+animation: pulse 3s ease-in-out infinite;
+}
+
+@keyframes pulse {
+0%, 100% { box-shadow: 0 0 40px rgba(29,185,84,0.4); }
+50% { box-shadow: 0 0 60px rgba(29,185,84,0.6); }
+}
+
+.setup-logo svg { width: 36px; height: 36px; fill: white; }
+
+.setup-title {
+font-size: 2.2rem;
+font-weight: 800;
+letter-spacing: -0.04em;
+margin-bottom: 0.5rem;
+background: linear-gradient(135deg, #fff 30%, var(–green));
+-webkit-background-clip: text;
+-webkit-text-fill-color: transparent;
+}
+
+.setup-subtitle {
+color: var(–muted);
+font-size: 0.95rem;
+margin-bottom: 2.5rem;
+font-family: ‘Space Mono’, monospace;
+line-height: 1.6;
+}
+
+.setup-card {
+background: var(–surface);
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 20px;
+padding: 1.5rem;
+width: 100%;
+max-width: 400px;
+margin-bottom: 1rem;
+text-align: left;
+}
+
+.setup-card label {
+display: block;
+font-size: 0.7rem;
+font-family: ‘Space Mono’, monospace;
+color: var(–green);
+letter-spacing: 0.1em;
+text-transform: uppercase;
+margin-bottom: 0.5rem;
+}
+
+.setup-card input {
+width: 100%;
+background: var(–surface2);
+border: 1px solid rgba(255,255,255,0.08);
+border-radius: 10px;
+padding: 0.75rem 1rem;
+color: var(–text);
+font-family: ‘Space Mono’, monospace;
+font-size: 0.85rem;
+outline: none;
+transition: border-color 0.2s;
+}
+
+.setup-card input:focus { border-color: var(–green); }
+
+.steps {
+background: var(–surface);
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 20px;
+padding: 1.5rem;
+width: 100%;
+max-width: 400px;
+margin-bottom: 1.5rem;
+text-align: left;
+}
+
+.steps-title {
+font-size: 0.7rem;
+font-family: ‘Space Mono’, monospace;
+color: var(–muted);
+letter-spacing: 0.1em;
+text-transform: uppercase;
+margin-bottom: 1rem;
+}
+
+.step {
+display: flex;
+gap: 0.75rem;
+margin-bottom: 0.75rem;
+align-items: flex-start;
+font-size: 0.85rem;
+color: var(–muted);
+line-height: 1.4;
+}
+
+.step-num {
+background: var(–surface3);
+color: var(–green);
+border-radius: 50%;
+width: 20px;
+height: 20px;
+min-width: 20px;
+display: flex;
+align-items: center;
+justify-content: center;
+font-size: 0.65rem;
+font-family: ‘Space Mono’, monospace;
+font-weight: 700;
+margin-top: 0.1rem;
+}
+
+.step a { color: var(–green); }
+
+.btn-connect {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 0.6rem;
+width: 100%;
+max-width: 400px;
+padding: 1rem;
+background: var(–green);
+border: none;
+border-radius: 100px;
+color: #000;
+font-family: ‘Syne’, sans-serif;
+font-size: 1rem;
+font-weight: 700;
+cursor: pointer;
+transition: all 0.2s;
+letter-spacing: -0.01em;
+}
+
+.btn-connect:active { transform: scale(0.97); background: var(–green-dim); }
+
+/* ─── LOADING ─── */
+#loading {
+display: none;
+flex-direction: column;
+align-items: center;
+justify-content: center;
+min-height: 100svh;
+gap: 1.5rem;
+}
+
+.spinner {
+width: 48px;
+height: 48px;
+border: 3px solid rgba(29,185,84,0.15);
+border-top-color: var(–green);
+border-radius: 50%;
+animation: spin 0.8s linear infinite;
+}
+
+@keyframes spin { to { transform: rotate(360deg); } }
+
+.loading-text {
+font-family: ‘Space Mono’, monospace;
+color: var(–muted);
+font-size: 0.8rem;
+letter-spacing: 0.1em;
+}
+
+/* ─── MAIN APP ─── */
+#main-app { display: none; padding-bottom: 5rem; }
+
+/* HEADER */
+.header {
+padding: 3.5rem 1.5rem 1.5rem;
+display: flex;
+align-items: flex-start;
+justify-content: space-between;
+gap: 1rem;
+}
+
+.header-left {}
+
+.header-greeting {
+font-size: 0.7rem;
+font-family: ‘Space Mono’, monospace;
+color: var(–green);
+letter-spacing: 0.15em;
+text-transform: uppercase;
+margin-bottom: 0.25rem;
+}
+
+.header-name {
+font-size: 1.8rem;
+font-weight: 800;
+letter-spacing: -0.04em;
+line-height: 1.1;
+}
+
+.avatar {
+width: 48px;
+height: 48px;
+border-radius: 50%;
+border: 2px solid var(–green);
+object-fit: cover;
+flex-shrink: 0;
+background: var(–surface2);
+}
+
+/* STATS GRID */
+.stats-row {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 0.75rem;
+padding: 0 1.5rem 1.5rem;
+}
+
+.stat-card {
+background: var(–surface);
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 18px;
+padding: 1.25rem;
+position: relative;
+overflow: hidden;
+}
+
+.stat-card::before {
+content: ‘’;
+position: absolute;
+top: 0; right: 0;
+width: 60px; height: 60px;
+background: radial-gradient(circle, rgba(29,185,84,0.15) 0%, transparent 70%);
+}
+
+.stat-label {
+font-size: 0.6rem;
+font-family: ‘Space Mono’, monospace;
+color: var(–muted);
+letter-spacing: 0.12em;
+text-transform: uppercase;
+margin-bottom: 0.4rem;
+}
+
+.stat-value {
+font-size: 1.6rem;
+font-weight: 800;
+letter-spacing: -0.05em;
+color: var(–text);
+line-height: 1;
+}
+
+.stat-value span {
+font-size: 0.75rem;
+font-weight: 400;
+color: var(–muted);
+letter-spacing: 0;
+font-family: ‘Space Mono’, monospace;
+}
+
+.stat-sub {
+font-size: 0.68rem;
+color: var(–green);
+font-family: ‘Space Mono’, monospace;
+margin-top: 0.25rem;
+}
+
+/* SECTION */
+.section {
+padding: 0 1.5rem 1.5rem;
+}
+
+.section-header {
+display: flex;
+align-items: center;
+justify-content: space-between;
+margin-bottom: 1rem;
+}
+
+.section-title {
+font-size: 1.1rem;
+font-weight: 700;
+letter-spacing: -0.03em;
+}
+
+.section-badge {
+font-size: 0.6rem;
+font-family: ‘Space Mono’, monospace;
+color: var(–green);
+background: rgba(29,185,84,0.1);
+border: 1px solid rgba(29,185,84,0.2);
+padding: 0.2rem 0.5rem;
+border-radius: 100px;
+letter-spacing: 0.08em;
+}
+
+/* TIME RANGE TABS */
+.tabs {
+display: flex;
+gap: 0.4rem;
+padding: 0 1.5rem 1rem;
+overflow-x: auto;
+scrollbar-width: none;
+}
+.tabs::-webkit-scrollbar { display: none; }
+
+.tab {
+flex-shrink: 0;
+padding: 0.45rem 0.9rem;
+border-radius: 100px;
+border: 1px solid rgba(255,255,255,0.08);
+background: transparent;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+font-size: 0.7rem;
+cursor: pointer;
+transition: all 0.2s;
+letter-spacing: 0.05em;
+}
+
+.tab.active {
+background: var(–green);
+border-color: var(–green);
+color: #000;
+font-weight: 700;
+}
+
+/* TRACK LIST */
+.track-list { display: flex; flex-direction: column; gap: 0.5rem; }
+
+.track-item {
+display: flex;
+align-items: center;
+gap: 0.9rem;
+background: var(–surface);
+border: 1px solid rgba(255,255,255,0.04);
+border-radius: 14px;
+padding: 0.75rem;
+transition: all 0.15s;
+text-decoration: none;
+color: inherit;
+animation: fadeUp 0.4s ease both;
+}
+
+@keyframes fadeUp {
+from { opacity: 0; transform: translateY(12px); }
+to { opacity: 1; transform: translateY(0); }
+}
+
+.track-rank {
+font-family: ‘Space Mono’, monospace;
+font-size: 0.7rem;
+color: var(–muted);
+min-width: 18px;
+text-align: center;
+}
+
+.track-rank.top3 { color: var(–green); font-weight: 700; }
+
+.track-img {
+width: 44px;
+height: 44px;
+border-radius: 8px;
+object-fit: cover;
+background: var(–surface2);
+flex-shrink: 0;
+}
+
+.track-info { flex: 1; min-width: 0; }
+
+.track-name {
+font-size: 0.9rem;
+font-weight: 600;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+letter-spacing: -0.01em;
+}
+
+.track-artist {
+font-size: 0.72rem;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+margin-top: 0.15rem;
+}
+
+.track-pop {
+display: flex;
+flex-direction: column;
+align-items: flex-end;
+gap: 0.2rem;
+flex-shrink: 0;
+}
+
+.pop-bar {
+width: 32px;
+height: 3px;
+background: var(–surface3);
+border-radius: 2px;
+overflow: hidden;
+}
+
+.pop-fill {
+height: 100%;
+background: var(–green);
+border-radius: 2px;
+transition: width 0.6s ease;
+}
+
+.pop-num {
+font-size: 0.6rem;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+}
+
+/* ARTIST LIST */
+.artist-grid {
+display: grid;
+grid-template-columns: repeat(2, 1fr);
+gap: 0.75rem;
+}
+
+.artist-card {
+background: var(–surface);
+border: 1px solid rgba(255,255,255,0.04);
+border-radius: 16px;
+padding: 1rem;
+display: flex;
+flex-direction: column;
+align-items: center;
+text-align: center;
+gap: 0.5rem;
+animation: fadeUp 0.4s ease both;
+}
+
+.artist-img {
+width: 64px;
+height: 64px;
+border-radius: 50%;
+object-fit: cover;
+background: var(–surface2);
+border: 2px solid rgba(29,185,84,0.2);
+}
+
+.artist-rank {
+position: absolute;
+top: -4px;
+right: -4px;
+background: var(–green);
+color: #000;
+font-size: 0.6rem;
+font-weight: 700;
+font-family: ‘Space Mono’, monospace;
+width: 18px;
+height: 18px;
+border-radius: 50%;
+display: flex;
+align-items: center;
+justify-content: center;
+}
+
+.artist-img-wrap { position: relative; }
+
+.artist-name {
+font-size: 0.8rem;
+font-weight: 700;
+letter-spacing: -0.02em;
+line-height: 1.2;
+}
+
+.artist-genre {
+font-size: 0.6rem;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+text-transform: uppercase;
+letter-spacing: 0.06em;
+}
+
+/* RECENTLY PLAYED */
+.recent-item {
+display: flex;
+align-items: center;
+gap: 0.9rem;
+padding: 0.6rem 0;
+border-bottom: 1px solid rgba(255,255,255,0.04);
+animation: fadeUp 0.3s ease both;
+}
+
+.recent-item:last-child { border-bottom: none; }
+
+.recent-img {
+width: 40px;
+height: 40px;
+border-radius: 6px;
+object-fit: cover;
+background: var(–surface2);
+flex-shrink: 0;
+}
+
+.recent-info { flex: 1; min-width: 0; }
+
+.recent-name {
+font-size: 0.85rem;
+font-weight: 600;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+}
+
+.recent-artist {
+font-size: 0.7rem;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+margin-top: 0.1rem;
+}
+
+.recent-time {
+font-size: 0.6rem;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+flex-shrink: 0;
+}
+
+/* GENRE CHART */
+.genre-list { display: flex; flex-direction: column; gap: 0.6rem; }
+
+.genre-item { display: flex; flex-direction: column; gap: 0.3rem; }
+
+.genre-row {
+display: flex;
+justify-content: space-between;
+align-items: center;
+}
+
+.genre-name {
+font-size: 0.8rem;
+font-weight: 600;
+text-transform: capitalize;
+}
+
+.genre-pct {
+font-size: 0.65rem;
+color: var(–green);
+font-family: ‘Space Mono’, monospace;
+}
+
+.genre-bar {
+height: 4px;
+background: var(–surface2);
+border-radius: 2px;
+overflow: hidden;
+}
+
+.genre-fill {
+height: 100%;
+background: linear-gradient(90deg, var(–green), #00e676);
+border-radius: 2px;
+transition: width 0.8s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+/* NOW PLAYING */
+.now-playing {
+background: linear-gradient(135deg, rgba(29,185,84,0.12), rgba(29,185,84,0.04));
+border: 1px solid rgba(29,185,84,0.2);
+border-radius: 20px;
+padding: 1.25rem;
+display: flex;
+align-items: center;
+gap: 1rem;
+margin: 0 1.5rem 1.5rem;
+}
+
+.now-img {
+width: 56px;
+height: 56px;
+border-radius: 10px;
+object-fit: cover;
+animation: rotateLP 8s linear infinite;
+border-radius: 50%;
+border: 3px solid var(–green);
+}
+
+@keyframes rotateLP {
+from { transform: rotate(0deg); }
+to { transform: rotate(360deg); }
+}
+
+.now-info { flex: 1; min-width: 0; }
+
+.now-label {
+font-size: 0.6rem;
+color: var(–green);
+font-family: ‘Space Mono’, monospace;
+letter-spacing: 0.15em;
+text-transform: uppercase;
+margin-bottom: 0.25rem;
+display: flex;
+align-items: center;
+gap: 0.3rem;
+}
+
+.now-dot {
+width: 6px;
+height: 6px;
+background: var(–green);
+border-radius: 50%;
+animation: blink 1s ease-in-out infinite;
+}
+
+@keyframes blink {
+0%, 100% { opacity: 1; }
+50% { opacity: 0.2; }
+}
+
+.now-name {
+font-size: 0.95rem;
+font-weight: 700;
+white-space: nowrap;
+overflow: hidden;
+text-overflow: ellipsis;
+letter-spacing: -0.02em;
+}
+
+.now-artist {
+font-size: 0.72rem;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+margin-top: 0.1rem;
+}
+
+/* BOTTOM NAV */
+.bottom-nav {
+position: fixed;
+bottom: 0;
+left: 0;
+right: 0;
+background: rgba(6,10,15,0.85);
+backdrop-filter: blur(20px);
+-webkit-backdrop-filter: blur(20px);
+border-top: 1px solid rgba(255,255,255,0.06);
+display: flex;
+padding: 0.6rem 0 calc(0.6rem + env(safe-area-inset-bottom));
+z-index: 100;
+}
+
+.nav-btn {
+flex: 1;
+display: flex;
+flex-direction: column;
+align-items: center;
+gap: 0.3rem;
+background: none;
+border: none;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+font-size: 0.55rem;
+cursor: pointer;
+padding: 0.3rem 0;
+transition: color 0.2s;
+letter-spacing: 0.06em;
+text-transform: uppercase;
+}
+
+.nav-btn.active { color: var(–green); }
+.nav-btn svg { width: 20px; height: 20px; }
+
+/* PAGES */
+.page { display: none; }
+.page.active { display: block; }
+
+/* LOGOUT */
+.logout-btn {
+display: flex;
+align-items: center;
+justify-content: center;
+gap: 0.5rem;
+margin: 1rem 1.5rem;
+padding: 0.75rem;
+background: rgba(255,59,48,0.08);
+border: 1px solid rgba(255,59,48,0.15);
+border-radius: 12px;
+color: #ff3b30;
+font-family: ‘Space Mono’, monospace;
+font-size: 0.75rem;
+cursor: pointer;
+letter-spacing: 0.05em;
+}
+
+.user-card {
+background: var(–surface);
+border: 1px solid rgba(255,255,255,0.06);
+border-radius: 20px;
+padding: 1.5rem;
+margin: 0 1.5rem 1.5rem;
+display: flex;
+align-items: center;
+gap: 1rem;
+}
+
+.user-avatar-lg {
+width: 64px;
+height: 64px;
+border-radius: 50%;
+border: 2px solid var(–green);
+object-fit: cover;
+}
+
+.user-meta {}
+.user-name-lg { font-size: 1.2rem; font-weight: 700; letter-spacing: -0.03em; }
+.user-followers {
+font-size: 0.7rem;
+color: var(–muted);
+font-family: ‘Space Mono’, monospace;
+margin-top: 0.2rem;
+}
+
+.error-msg {
+background: rgba(255,59,48,0.08);
+border: 1px solid rgba(255,59,48,0.2);
+border-radius: 12px;
+padding: 1rem;
+margin: 0 1.5rem;
+font-size: 0.8rem;
+color: #ff6b6b;
+font-family: ‘Space Mono’, monospace;
+line-height: 1.5;
+}
 </style>
+
 </head>
 <body>
 <div id="app">
 
   <!-- SETUP SCREEN -->
+
   <div id="setup-screen">
     <div class="setup-logo">
       <svg viewBox="0 0 24 24"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
@@ -817,201 +820,209 @@
     <div class="setup-title">Spotify Stats</div>
     <div class="setup-subtitle">Tes stats musicales<br>en temps réel 🎵</div>
 
-    <div class="steps">
-      <div class="steps-title">Configuration requise</div>
-      <div class="step">
-        <div class="step-num">1</div>
-        <div>Va sur <a href="https://developer.spotify.com/dashboard" target="_blank">developer.spotify.com/dashboard</a> et crée une app</div>
-      </div>
-      <div class="step">
-        <div class="step-num">2</div>
-        <div>Dans les settings de l'app, ajoute <strong style="color:var(--text)">cette URL exacte</strong> comme Redirect URI :<br><span id="current-url" style="color:var(--green);font-size:0.75rem;word-break:break-all;"></span></div>
-      </div>
-      <div class="step">
-        <div class="step-num">3</div>
-        <div>Copie ton <strong style="color:var(--text)">Client ID</strong> et colle-le ci-dessous</div>
-      </div>
-    </div>
+```
+<div class="steps">
+  <div class="steps-title">Configuration requise</div>
+  <div class="step">
+    <div class="step-num">1</div>
+    <div>Va sur <a href="https://developer.spotify.com/dashboard" target="_blank">developer.spotify.com/dashboard</a> et crée une app</div>
+  </div>
+  <div class="step">
+    <div class="step-num">2</div>
+    <div>Dans les settings de l'app, ajoute <strong style="color:var(--text)">cette URL exacte</strong> comme Redirect URI :<br><span id="current-url" style="color:var(--green);font-size:0.75rem;word-break:break-all;"></span></div>
+  </div>
+  <div class="step">
+    <div class="step-num">3</div>
+    <div>Copie ton <strong style="color:var(--text)">Client ID</strong> et colle-le ci-dessous</div>
+  </div>
+</div>
 
-    <div class="setup-card">
-      <label>Client ID Spotify</label>
-      <input type="text" id="client-id-input" placeholder="Ex: a1b2c3d4e5f6..." autocomplete="off" spellcheck="false">
-    </div>
+<div class="setup-card">
+  <label>Client ID Spotify</label>
+  <input type="text" id="client-id-input" placeholder="Ex: a1b2c3d4e5f6..." autocomplete="off" spellcheck="false">
+</div>
 
-    <button class="btn-connect" onclick="startAuth()">
-      <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
-      Se connecter avec Spotify
-    </button>
+<button class="btn-connect" onclick="startAuth()">
+  <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M12 0C5.4 0 0 5.4 0 12s5.4 12 12 12 12-5.4 12-12S18.66 0 12 0zm5.521 17.34c-.24.359-.66.48-1.021.24-2.82-1.74-6.36-2.101-10.561-1.141-.418.122-.779-.179-.899-.539-.12-.421.18-.78.54-.9 4.56-1.021 8.52-.6 11.64 1.32.42.18.479.659.301 1.02zm1.44-3.3c-.301.42-.841.6-1.262.3-3.239-1.98-8.159-2.58-11.939-1.38-.479.12-1.02-.12-1.14-.6-.12-.48.12-1.021.6-1.141C9.6 9.9 15 10.561 18.72 12.84c.361.181.54.78.241 1.2zm.12-3.36C15.24 8.4 8.82 8.16 5.16 9.301c-.6.179-1.2-.181-1.38-.721-.18-.601.18-1.2.72-1.381 4.26-1.26 11.28-1.02 15.721 1.621.539.3.719 1.02.419 1.56-.299.421-1.02.599-1.559.3z"/></svg>
+  Se connecter avec Spotify
+</button>
+```
+
   </div>
 
   <!-- LOADING -->
+
   <div id="loading">
     <div class="spinner"></div>
     <div class="loading-text">CHARGEMENT DES STATS...</div>
   </div>
 
   <!-- MAIN APP -->
+
   <div id="main-app">
 
-    <!-- TOP NAV + TABS -->
-    <div class="header">
-      <div class="header-left">
-        <div class="header-greeting">Tes Stats</div>
-        <div class="header-name" id="user-name">Hey 👋</div>
-      </div>
-      <img id="user-avatar" class="avatar" src="" alt="">
-    </div>
+```
+<!-- TOP NAV + TABS -->
+<div class="header">
+  <div class="header-left">
+    <div class="header-greeting">Tes Stats</div>
+    <div class="header-name" id="user-name">Hey 👋</div>
+  </div>
+  <img id="user-avatar" class="avatar" src="" alt="">
+</div>
 
-    <!-- PAGES -->
-    <!-- PAGE: TOP -->
-    <div class="page active" id="page-top">
+<!-- PAGES -->
+<!-- PAGE: TOP -->
+<div class="page active" id="page-top">
 
-      <!-- NOW PLAYING (if available) -->
-      <div id="now-playing-section" style="display:none">
-        <div class="now-playing">
-          <img id="now-img" class="now-img" src="" alt="">
-          <div class="now-info">
-            <div class="now-label"><div class="now-dot"></div> En écoute</div>
-            <div class="now-name" id="now-name"></div>
-            <div class="now-artist" id="now-artist"></div>
-          </div>
-        </div>
-      </div>
-
-      <!-- STATS CARDS -->
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Titres top</div>
-          <div class="stat-value" id="stat-tracks">—</div>
-          <div class="stat-sub">Toutes périodes</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Artistes top</div>
-          <div class="stat-value" id="stat-artists">—</div>
-          <div class="stat-sub">Toutes périodes</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Récents 24h</div>
-          <div class="stat-value" id="stat-recent">—</div>
-          <div class="stat-sub">Dernières écoutes</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Popularité moy.</div>
-          <div class="stat-value" id="stat-pop">—<span>%</span></div>
-          <div class="stat-sub">Top titres</div>
-        </div>
-      </div>
-
-      <!-- GENRE PIE -->
-      <div class="section">
-        <div class="section-header">
-          <div class="section-title">Tes genres</div>
-          <div class="section-badge">TOP 5</div>
-        </div>
-        <div class="genre-list" id="genre-list"></div>
+  <!-- NOW PLAYING (if available) -->
+  <div id="now-playing-section" style="display:none">
+    <div class="now-playing">
+      <img id="now-img" class="now-img" src="" alt="">
+      <div class="now-info">
+        <div class="now-label"><div class="now-dot"></div> En écoute</div>
+        <div class="now-name" id="now-name"></div>
+        <div class="now-artist" id="now-artist"></div>
       </div>
     </div>
+  </div>
 
-    <!-- PAGE: TRACKS -->
-    <div class="page" id="page-tracks">
-      <div class="section" style="padding-top:1.5rem">
-        <div class="section-header">
-          <div class="section-title">Top Titres</div>
-        </div>
-      </div>
-      <div class="tabs" id="tracks-tabs">
-        <button class="tab active" onclick="switchRange('tracks','short_term',this)">4 semaines</button>
-        <button class="tab" onclick="switchRange('tracks','medium_term',this)">6 mois</button>
-        <button class="tab" onclick="switchRange('tracks','long_term',this)">Tout le temps</button>
-      </div>
-      <div class="section">
-        <div class="track-list" id="tracks-list"></div>
-      </div>
+  <!-- STATS CARDS -->
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Titres top</div>
+      <div class="stat-value" id="stat-tracks">—</div>
+      <div class="stat-sub">Toutes périodes</div>
     </div>
-
-    <!-- PAGE: ARTISTS -->
-    <div class="page" id="page-artists">
-      <div class="section" style="padding-top:1.5rem">
-        <div class="section-header">
-          <div class="section-title">Top Artistes</div>
-        </div>
-      </div>
-      <div class="tabs" id="artists-tabs">
-        <button class="tab active" onclick="switchRange('artists','short_term',this)">4 semaines</button>
-        <button class="tab" onclick="switchRange('artists','medium_term',this)">6 mois</button>
-        <button class="tab" onclick="switchRange('artists','long_term',this)">Tout le temps</button>
-      </div>
-      <div class="section">
-        <div class="artist-grid" id="artists-list"></div>
-      </div>
+    <div class="stat-card">
+      <div class="stat-label">Artistes top</div>
+      <div class="stat-value" id="stat-artists">—</div>
+      <div class="stat-sub">Toutes périodes</div>
     </div>
-
-    <!-- PAGE: RECENT -->
-    <div class="page" id="page-recent">
-      <div class="section" style="padding-top:1.5rem">
-        <div class="section-header">
-          <div class="section-title">Récemment écoutés</div>
-          <div class="section-badge">50 DERNIERS</div>
-        </div>
-        <div id="recent-list"></div>
-      </div>
+    <div class="stat-card">
+      <div class="stat-label">Récents 24h</div>
+      <div class="stat-value" id="stat-recent">—</div>
+      <div class="stat-sub">Dernières écoutes</div>
     </div>
-
-    <!-- PAGE: PROFIL -->
-    <div class="page" id="page-profile">
-      <div class="section" style="padding-top:1.5rem">
-        <div class="section-title" style="margin-bottom:1rem">Profil</div>
-      </div>
-      <div class="user-card">
-        <img id="profile-avatar" class="user-avatar-lg" src="" alt="">
-        <div class="user-meta">
-          <div class="user-name-lg" id="profile-name"></div>
-          <div class="user-followers" id="profile-followers"></div>
-        </div>
-      </div>
-
-      <div class="stats-row">
-        <div class="stat-card">
-          <div class="stat-label">Durée moy.</div>
-          <div class="stat-value" id="stat-duration">—<span>min</span></div>
-          <div class="stat-sub">Par titre top</div>
-        </div>
-        <div class="stat-card">
-          <div class="stat-label">Genres uniques</div>
-          <div class="stat-value" id="stat-genres">—</div>
-          <div class="stat-sub">Top artistes</div>
-        </div>
-      </div>
-
-      <button class="logout-btn" onclick="logout()">
-        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-        Déconnexion
-      </button>
+    <div class="stat-card">
+      <div class="stat-label">Popularité moy.</div>
+      <div class="stat-value" id="stat-pop">—<span>%</span></div>
+      <div class="stat-sub">Top titres</div>
     </div>
+  </div>
 
-    <!-- BOTTOM NAV -->
-    <nav class="bottom-nav">
-      <button class="nav-btn active" onclick="showPage('top',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
-        Stats
-      </button>
-      <button class="nav-btn" onclick="showPage('tracks',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
-        Titres
-      </button>
-      <button class="nav-btn" onclick="showPage('artists',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
-        Artistes
-      </button>
-      <button class="nav-btn" onclick="showPage('recent',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-        Récents
-      </button>
-      <button class="nav-btn" onclick="showPage('profile',this)">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
-        Profil
-      </button>
-    </nav>
+  <!-- GENRE PIE -->
+  <div class="section">
+    <div class="section-header">
+      <div class="section-title">Tes genres</div>
+      <div class="section-badge">TOP 5</div>
+    </div>
+    <div class="genre-list" id="genre-list"></div>
+  </div>
+</div>
+
+<!-- PAGE: TRACKS -->
+<div class="page" id="page-tracks">
+  <div class="section" style="padding-top:1.5rem">
+    <div class="section-header">
+      <div class="section-title">Top Titres</div>
+    </div>
+  </div>
+  <div class="tabs" id="tracks-tabs">
+    <button class="tab active" onclick="switchRange('tracks','short_term',this)">4 semaines</button>
+    <button class="tab" onclick="switchRange('tracks','medium_term',this)">6 mois</button>
+    <button class="tab" onclick="switchRange('tracks','long_term',this)">Tout le temps</button>
+  </div>
+  <div class="section">
+    <div class="track-list" id="tracks-list"></div>
+  </div>
+</div>
+
+<!-- PAGE: ARTISTS -->
+<div class="page" id="page-artists">
+  <div class="section" style="padding-top:1.5rem">
+    <div class="section-header">
+      <div class="section-title">Top Artistes</div>
+    </div>
+  </div>
+  <div class="tabs" id="artists-tabs">
+    <button class="tab active" onclick="switchRange('artists','short_term',this)">4 semaines</button>
+    <button class="tab" onclick="switchRange('artists','medium_term',this)">6 mois</button>
+    <button class="tab" onclick="switchRange('artists','long_term',this)">Tout le temps</button>
+  </div>
+  <div class="section">
+    <div class="artist-grid" id="artists-list"></div>
+  </div>
+</div>
+
+<!-- PAGE: RECENT -->
+<div class="page" id="page-recent">
+  <div class="section" style="padding-top:1.5rem">
+    <div class="section-header">
+      <div class="section-title">Récemment écoutés</div>
+      <div class="section-badge">50 DERNIERS</div>
+    </div>
+    <div id="recent-list"></div>
+  </div>
+</div>
+
+<!-- PAGE: PROFIL -->
+<div class="page" id="page-profile">
+  <div class="section" style="padding-top:1.5rem">
+    <div class="section-title" style="margin-bottom:1rem">Profil</div>
+  </div>
+  <div class="user-card">
+    <img id="profile-avatar" class="user-avatar-lg" src="" alt="">
+    <div class="user-meta">
+      <div class="user-name-lg" id="profile-name"></div>
+      <div class="user-followers" id="profile-followers"></div>
+    </div>
+  </div>
+
+  <div class="stats-row">
+    <div class="stat-card">
+      <div class="stat-label">Durée moy.</div>
+      <div class="stat-value" id="stat-duration">—<span>min</span></div>
+      <div class="stat-sub">Par titre top</div>
+    </div>
+    <div class="stat-card">
+      <div class="stat-label">Genres uniques</div>
+      <div class="stat-value" id="stat-genres">—</div>
+      <div class="stat-sub">Top artistes</div>
+    </div>
+  </div>
+
+  <button class="logout-btn" onclick="logout()">
+    <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+    Déconnexion
+  </button>
+</div>
+
+<!-- BOTTOM NAV -->
+<nav class="bottom-nav">
+  <button class="nav-btn active" onclick="showPage('top',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="23 6 13.5 15.5 8.5 10.5 1 18"/><polyline points="17 6 23 6 23 12"/></svg>
+    Stats
+  </button>
+  <button class="nav-btn" onclick="showPage('tracks',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 18V5l12-2v13"/><circle cx="6" cy="18" r="3"/><circle cx="18" cy="16" r="3"/></svg>
+    Titres
+  </button>
+  <button class="nav-btn" onclick="showPage('artists',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/><path d="M16 3.13a4 4 0 0 1 0 7.75"/></svg>
+    Artistes
+  </button>
+  <button class="nav-btn" onclick="showPage('recent',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+    Récents
+  </button>
+  <button class="nav-btn" onclick="showPage('profile',this)">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    Profil
+  </button>
+</nav>
+```
+
   </div>
 
 </div>
@@ -1027,7 +1038,7 @@ const SCOPES = [
 const REDIRECT_URI = window.location.href.split('?')[0].split('#')[0];
 
 // Show current URL for setup
-document.getElementById('current-url').textContent = REDIRECT_URI;
+document.getElementById('current-url').textContent = window.location.origin + window.location.pathname;
 
 // ─── STATE ───
 let accessToken = null;
@@ -1059,10 +1070,13 @@ async function startAuth() {
   const challenge = await generateCodeChallenge(verifier);
   localStorage.setItem('pkce_verifier', verifier);
 
+  // Même logique que exchangeToken
+  const redirectUri = window.location.origin + window.location.pathname;
+
   const params = new URLSearchParams({
     client_id: clientId,
     response_type: 'code',
-    redirect_uri: REDIRECT_URI,
+    redirect_uri: redirectUri,
     code_challenge_method: 'S256',
     code_challenge: challenge,
     scope: SCOPES,
@@ -1071,24 +1085,52 @@ async function startAuth() {
   window.location.href = 'https://accounts.spotify.com/authorize?' + params;
 }
 
+function showError(msg) {
+  // Remove old errors
+  document.querySelectorAll('.error-msg').forEach(e => e.remove());
+  const div = document.createElement('div');
+  div.className = 'error-msg';
+  div.style.cssText = 'margin:1rem 0;white-space:pre-wrap;font-size:0.75rem;';
+  div.textContent = msg;
+  const setupScreen = document.getElementById('setup-screen');
+  setupScreen.insertBefore(div, setupScreen.querySelector('.btn-connect'));
+}
+
 async function exchangeToken(code) {
   const clientId = localStorage.getItem('spotify_client_id');
   const verifier = localStorage.getItem('pkce_verifier');
-  if (!clientId || !verifier) { showSetup(); return; }
 
-  const res = await fetch('https://accounts.spotify.com/api/token', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-    body: new URLSearchParams({
-      client_id: clientId,
-      grant_type: 'authorization_code',
-      code,
-      redirect_uri: REDIRECT_URI,
-      code_verifier: verifier,
-    }),
-  });
+  if (!clientId) {
+    showError("Client ID introuvable. Recharge la page et reconnecte-toi.");
+    showSetup(); return;
+  }
+  if (!verifier) {
+    showError("Session expirée (verifier perdu). Recharge et réessaie.");
+    showSetup(); return;
+  }
 
-  const data = await res.json();
+  // GitHub Pages : on force l'URL sans trailing slash ni query
+  const redirectUri = window.location.origin + window.location.pathname;
+
+  let data;
+  try {
+    const res = await fetch('https://accounts.spotify.com/api/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+      body: new URLSearchParams({
+        client_id: clientId,
+        grant_type: 'authorization_code',
+        code,
+        redirect_uri: redirectUri,
+        code_verifier: verifier,
+      }),
+    });
+    data = await res.json();
+  } catch(e) {
+    showError("Erreur réseau : " + e.message);
+    showSetup(); return;
+  }
+
   if (data.access_token) {
     accessToken = data.access_token;
     const expiry = Date.now() + data.expires_in * 1000;
@@ -1096,12 +1138,12 @@ async function exchangeToken(code) {
     localStorage.setItem('spotify_token_expiry', expiry);
     if (data.refresh_token) localStorage.setItem('spotify_refresh', data.refresh_token);
     localStorage.removeItem('pkce_verifier');
-    // Clean URL
-    window.history.replaceState({}, '', REDIRECT_URI);
+    window.history.replaceState({}, '', redirectUri);
     loadAllData();
   } else {
+    const msg = data.error_description || data.error || JSON.stringify(data);
+    showError("Spotify a refusé : " + msg + "\n\nRedirect URI utilisé : " + redirectUri + "\n\nVérifie que cette URL exacte est dans ton dashboard Spotify.");
     showSetup();
-    console.error(data);
   }
 }
 
@@ -1345,5 +1387,6 @@ async function init() {
 
 init();
 </script>
+
 </body>
 </html>
