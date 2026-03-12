@@ -1065,13 +1065,19 @@ async function startAuth() {
   const clientId = document.getElementById('client-id-input').value.trim();
   if (!clientId) { alert('Entre ton Client ID Spotify !'); return; }
 
-  localStorage.setItem('spotify_client_id', clientId);
   const verifier = generateRandomString(64);
   const challenge = await generateCodeChallenge(verifier);
-  localStorage.setItem('pkce_verifier', verifier);
-
-  // Même logique que exchangeToken
   const redirectUri = window.location.origin + window.location.pathname;
+
+  // FIX iOS Safari : on encode clientId + verifier dans "state"
+  // iOS Safari efface localStorage pendant les redirections cross-site (ITP)
+  // En mettant les données dans state, elles survivent au redirect
+  const stateData = JSON.stringify({ clientId, verifier });
+  const state = btoa(encodeURIComponent(stateData));
+
+  // Sauvegarde aussi localStorage comme fallback (autres navigateurs)
+  localStorage.setItem('spotify_client_id', clientId);
+  localStorage.setItem('pkce_verifier', verifier);
 
   const params = new URLSearchParams({
     client_id: clientId,
@@ -1080,13 +1086,13 @@ async function startAuth() {
     code_challenge_method: 'S256',
     code_challenge: challenge,
     scope: SCOPES,
+    state: state,
   });
 
   window.location.href = 'https://accounts.spotify.com/authorize?' + params;
 }
 
 function showError(msg) {
-  // Remove old errors
   document.querySelectorAll('.error-msg').forEach(e => e.remove());
   const div = document.createElement('div');
   div.className = 'error-msg';
@@ -1096,20 +1102,30 @@ function showError(msg) {
   setupScreen.insertBefore(div, setupScreen.querySelector('.btn-connect'));
 }
 
-async function exchangeToken(code) {
-  const clientId = localStorage.getItem('spotify_client_id');
-  const verifier = localStorage.getItem('pkce_verifier');
+async function exchangeToken(code, stateParam) {
+  let clientId = null;
+  let verifier = null;
 
-  if (!clientId) {
-    showError("Client ID introuvable. Recharge la page et reconnecte-toi.");
+  // 1. Lire depuis state (survit à iOS Safari ITP)
+  if (stateParam) {
+    try {
+      const decoded = JSON.parse(decodeURIComponent(atob(stateParam)));
+      clientId = decoded.clientId;
+      verifier = decoded.verifier;
+    } catch(e) {
+      console.warn('state parse failed:', e);
+    }
+  }
+
+  // 2. Fallback localStorage (autres navigateurs)
+  if (!clientId) clientId = localStorage.getItem('spotify_client_id');
+  if (!verifier) verifier = localStorage.getItem('pkce_verifier');
+
+  if (!clientId || !verifier) {
+    showError("Session perdue (problème iOS Safari).\nRecharge la page, entre ton Client ID et reconnecte-toi.");
     showSetup(); return;
   }
-  if (!verifier) {
-    showError("Session expirée (verifier perdu). Recharge et réessaie.");
-    showSetup(); return;
-  }
 
-  // GitHub Pages : on force l'URL sans trailing slash ni query
   const redirectUri = window.location.origin + window.location.pathname;
 
   let data;
@@ -1136,13 +1152,14 @@ async function exchangeToken(code) {
     const expiry = Date.now() + data.expires_in * 1000;
     localStorage.setItem('spotify_token', accessToken);
     localStorage.setItem('spotify_token_expiry', expiry);
+    localStorage.setItem('spotify_client_id', clientId);
     if (data.refresh_token) localStorage.setItem('spotify_refresh', data.refresh_token);
     localStorage.removeItem('pkce_verifier');
     window.history.replaceState({}, '', redirectUri);
     loadAllData();
   } else {
     const msg = data.error_description || data.error || JSON.stringify(data);
-    showError("Spotify a refusé : " + msg + "\n\nRedirect URI utilisé : " + redirectUri + "\n\nVérifie que cette URL exacte est dans ton dashboard Spotify.");
+    showError("Erreur Spotify : " + msg + "\nRedirect URI : " + redirectUri);
     showSetup();
   }
 }
@@ -1362,10 +1379,11 @@ function showSetup() { show('setup-screen'); }
 async function init() {
   const params = new URLSearchParams(window.location.search);
   const code = params.get('code');
+  const state = params.get('state');
 
   if (code) {
     show('loading');
-    await exchangeToken(code);
+    await exchangeToken(code, state);
     return;
   }
 
