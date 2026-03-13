@@ -38,7 +38,6 @@
     .divider { width: 100%; max-width: 360px; display: flex; align-items: center; gap: 12px; margin: 18px 0; }
     .divider::before,.divider::after { content:''; flex:1; height:1px; background: linear-gradient(to right, transparent, var(--gold), transparent); }
     .divider-icon { color: var(--gold); font-size: 16px; }
-
     .api-section { width: 100%; max-width: 420px; margin-bottom: 20px; }
     .api-label { font-size: 12px; color: var(--ink-dim); letter-spacing: .12em; text-transform: uppercase; margin-bottom: 8px; display: flex; align-items: center; gap: 8px; }
     .api-label a { color: var(--gold); text-decoration: none; font-size: 11px; }
@@ -51,16 +50,13 @@
     .api-status { font-size: 12px; margin-top: 6px; min-height: 16px; font-style: italic; }
     .api-status.ok  { color: #7ab87a; }
     .api-status.err { color: #c46a6a; }
-
-    .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(120,80,200,.12); border: 1px solid rgba(120,80,200,.3); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: #b39ddb; letter-spacing: .1em; margin-bottom: 12px; }
-
+    .badge { display: inline-flex; align-items: center; gap: 6px; background: rgba(66,133,244,.12); border: 1px solid rgba(66,133,244,.3); border-radius: 20px; padding: 4px 12px; font-size: 11px; color: #7ab8f5; letter-spacing: .1em; margin-bottom: 12px; }
     .btn-wrap { margin: 4px 0 24px; }
     .btn { background: linear-gradient(145deg,#2a1f08,#1a1208); border: 1px solid var(--gold); border-radius: 4px; color: var(--gold-light); font-family: 'Cinzel Decorative', serif; font-size: 13px; letter-spacing: .12em; padding: 16px 36px; cursor: pointer; box-shadow: 0 0 20px rgba(201,168,76,.15); transition: transform .1s; -webkit-tap-highlight-color: transparent; }
     .btn:active { transform: scale(.96); }
     .btn.loading { pointer-events: none; opacity: .7; }
     .spinner { display: none; width: 20px; height: 20px; border: 2px solid rgba(201,168,76,.3); border-top-color: var(--gold); border-radius: 50%; animation: spin .8s linear infinite; margin: 0 auto; }
     @keyframes spin { to { transform: rotate(360deg); } }
-
     .card { width: 100%; max-width: 420px; background: linear-gradient(160deg,#1e1608,#120e04); border: 1px solid rgba(201,168,76,.35); border-radius: 6px; padding: 28px 24px; box-shadow: 0 0 40px rgba(201,168,76,.08),0 20px 60px rgba(0,0,0,.6); position: relative; opacity: 0; transform: translateY(16px); transition: opacity .5s,transform .5s; }
     .card.visible { opacity: 1; transform: translateY(0); }
     .card::before { content:'✦'; position:absolute; top:8px; left:12px; color:var(--gold); opacity:.5; font-size:10px; }
@@ -70,7 +66,6 @@
     .inner-divider { width: 60%; height: 1px; background: linear-gradient(to right,transparent,var(--gold),transparent); margin: 0 auto 20px; }
     .saint-text { font-size: clamp(15px,4.2vw,17px); line-height: 1.85; color: var(--ink); text-align: justify; hyphens: auto; }
     .saint-text p { margin-bottom: .6em; }
-
     .error-box { width: 100%; max-width: 420px; text-align: center; color: #c46a6a; font-style: italic; font-size: 15px; padding: 16px 20px; border: 1px solid rgba(180,60,60,.3); border-radius: 4px; background: rgba(80,10,10,.3); display: none; line-height: 1.6; }
     .footer { margin-top: 32px; padding-bottom: 16px; text-align: center; font-size: 11px; color: rgba(168,144,96,.35); letter-spacing: .15em; }
   </style>
@@ -86,14 +81,14 @@
 
   <div class="api-section">
     <div style="text-align:center; margin-bottom:10px;">
-      <span class="badge">⚡ Propulsé par OpenRouter — Gratuit</span>
+      <span class="badge">⚡ Propulsé par Google Gemini — Gratuit</span>
     </div>
     <div class="api-label">
-      🔑 Clé API OpenRouter
-      <a href="https://openrouter.ai/settings/keys" target="_blank">Obtenir une clé gratuite →</a>
+      🔑 Clé API Google Gemini
+      <a href="https://aistudio.google.com/app/apikey" target="_blank">Obtenir une clé gratuite →</a>
     </div>
     <div class="api-row">
-      <input class="api-input" type="password" id="apiKeyInput" placeholder="sk-or-…" />
+      <input class="api-input" type="password" id="apiKeyInput" placeholder="AIza…" />
       <button class="api-save" onclick="saveKey()">Sauver</button>
     </div>
     <div class="api-status" id="apiStatus"></div>
@@ -122,7 +117,7 @@
     document.getElementById('dateDisplay').textContent =
       now.toLocaleDateString('fr-FR', {weekday:'long',day:'numeric',month:'long',year:'numeric'});
 
-    const saved = localStorage.getItem('openrouter_key');
+    const saved = localStorage.getItem('gemini_key');
     if (saved) {
       document.getElementById('apiKeyInput').value = saved;
       document.getElementById('apiStatus').textContent = '✓ Clé chargée';
@@ -132,26 +127,26 @@
     function saveKey() {
       const key = document.getElementById('apiKeyInput').value.trim();
       const status = document.getElementById('apiStatus');
-      if (!key.startsWith('sk-or-')) {
-        status.textContent = '✗ Format invalide (doit commencer par sk-or-)';
+      if (!key.startsWith('AIza')) {
+        status.textContent = '✗ Format invalide (doit commencer par AIza)';
         status.className = 'api-status err';
         return;
       }
-      localStorage.setItem('openrouter_key', key);
+      localStorage.setItem('gemini_key', key);
       status.textContent = '✓ Clé sauvegardée !';
       status.className = 'api-status ok';
     }
 
     async function fetchSaint() {
-      const apiKey = localStorage.getItem('openrouter_key') || document.getElementById('apiKeyInput').value.trim();
+      const apiKey = localStorage.getItem('gemini_key') || document.getElementById('apiKeyInput').value.trim();
       const btn = document.getElementById('mainBtn');
       const btnText = document.getElementById('btnText');
       const spinner = document.getElementById('spinner');
       const card = document.getElementById('card');
       const errorBox = document.getElementById('errorBox');
 
-      if (!apiKey || !apiKey.startsWith('sk-or-')) {
-        errorBox.innerHTML = '⚠️ Entre et sauvegarde ta clé API OpenRouter ci-dessus.<br><small>Obtiens-en une gratuitement sur <a href="https://openrouter.ai/settings/keys" target="_blank" style="color:var(--gold)">openrouter.ai</a></small>';
+      if (!apiKey || !apiKey.startsWith('AIza')) {
+        errorBox.innerHTML = '⚠️ Entre et sauvegarde ta clé API Gemini ci-dessus.<br><small>Obtiens-en une gratuitement sur <a href="https://aistudio.google.com/app/apikey" target="_blank" style="color:var(--gold)">aistudio.google.com</a></small>';
         errorBox.style.display = 'block';
         return;
       }
@@ -163,33 +158,22 @@
       spinner.style.display = 'block';
 
       const today = now.toLocaleDateString('fr-FR', {day:'numeric',month:'long'});
+      const prompt = `Tu es un expert du calendrier catholique des saints. Aujourd'hui c'est le ${today}. Quel saint est fêté aujourd'hui ? Réponds UNIQUEMENT en JSON valide, sans texte avant ou après, sans balises markdown. Format exact :
+{"nom":"Prénom Nom","texte":"Ligne 1.\\nLigne 2.\\nLigne 3.\\nLigne 4.\\nLigne 5.\\nLigne 6.\\nLigne 7.\\nLigne 8.\\nLigne 9.\\nLigne 10."}
+Le texte doit avoir exactement 10 lignes séparées par \\n, chacune de 1-2 phrases en français.`;
 
       try {
-        const response = await fetch("https://openrouter.ai/api/v1/chat/completions", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-            "Authorization": `Bearer ${apiKey}`,
-            "HTTP-Referer": window.location.href,
-            "X-Title": "Saint du Jour"
-          },
-          body: JSON.stringify({
-            model: "meta-llama/llama-3.3-8b-instruct:free",
-            max_tokens: 1000,
-            messages: [
-              {
-                role: "system",
-                content: `Tu es un expert du calendrier catholique des saints. Réponds UNIQUEMENT en JSON valide, sans texte avant ou après, sans balises markdown. Format exact :
-{"nom":"Prénom Nom","texte":"Ligne 1.\\nLigne 2.\\nLigne 3.\\nLigne 4.\\nLigne 5.\\nLigne 6.\\nLigne 7.\\nLigne 8.\\nLigne 9.\\nLigne 10."}
-Le texte doit avoir exactement 10 lignes séparées par \\n, chacune de 1-2 phrases en français.`
-              },
-              {
-                role: "user",
-                content: `Aujourd'hui c'est le ${today}. Quel saint est fêté aujourd'hui dans le calendrier catholique ? Donne son nom et un texte de 10 lignes sur lui.`
-              }
-            ]
-          })
-        });
+        const response = await fetch(
+          `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${apiKey}`,
+          {
+            method: "POST",
+            headers: { "Content-Type": "application/json" },
+            body: JSON.stringify({
+              contents: [{ parts: [{ text: prompt }] }],
+              generationConfig: { temperature: 0.7, maxOutputTokens: 1000 }
+            })
+          }
+        );
 
         if (!response.ok) {
           const err = await response.json().catch(() => ({}));
@@ -197,7 +181,7 @@ Le texte doit avoir exactement 10 lignes séparées par \\n, chacune de 1-2 phra
         }
 
         const data = await response.json();
-        const raw = data.choices?.[0]?.message?.content || '';
+        const raw = data.candidates?.[0]?.content?.parts?.[0]?.text || '';
         const clean = raw.replace(/```json|```/g,'').trim();
         const parsed = JSON.parse(clean);
 
